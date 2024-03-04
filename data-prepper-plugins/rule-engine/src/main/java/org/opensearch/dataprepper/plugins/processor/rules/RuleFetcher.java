@@ -53,9 +53,9 @@ public class RuleFetcher implements Runnable {
     @Override
     public void run() {
         try {
-            LOG.info("Starting rule fetch");
+            LOG.debug("Starting rule fetch");
             final List<Detector> detectors = getDetectors();
-            LOG.info("Found detectors: {}", detectors);
+            LOG.debug("Found detectors: {}", detectors);
 
             final Map<String, List<Rule>> indexToPrepackagedRules = getIndexToPrepackagedRules(detectors);
             final Map<String, List<Rule>> indexToCustomRules = getIndexToCustomRules(detectors);

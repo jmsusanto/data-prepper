@@ -51,8 +51,6 @@ public class RuleEngine {
         }
 
         final Map<String, List<Rule>> indexToSigmaRules = ruleStore.getRules();
-        LOG.info("Got index to rules: {}", indexToSigmaRules);
-
         final Map<String, List<Finding>> allFindings = new HashMap<>();
         eventWrappers.forEach(eventWrapper -> {
             final String indexName = eventWrapper.getIndexName();
@@ -102,7 +100,7 @@ public class RuleEngine {
         final List<BulkOperation> allBulkOperations = new ArrayList<>();
         allFindings.forEach((findingsIndex, findings) -> {
             final List<BulkOperation> bulkOperations = findings.stream()
-                    .peek(finding -> LOG.info("Indexing finding with ID: {}", finding.getId()))
+                    .peek(finding -> LOG.debug("Indexing finding with ID: {}", finding.getId()))
                     .map(finding -> new IndexOperation.Builder<>()
                             .id(finding.getId())
                             .index(findingsIndex)
