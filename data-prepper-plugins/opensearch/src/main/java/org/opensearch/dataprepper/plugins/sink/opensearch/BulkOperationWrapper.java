@@ -6,6 +6,7 @@
 package org.opensearch.dataprepper.plugins.sink.opensearch;
 
 import org.opensearch.client.opensearch.core.bulk.BulkOperation;
+import org.opensearch.dataprepper.model.event.Event;
 import org.opensearch.dataprepper.model.event.EventHandle;
 import org.opensearch.dataprepper.plugins.sink.opensearch.bulk.SerializedJson;
 
@@ -45,24 +46,30 @@ public class BulkOperationWrapper {
     private final EventHandle eventHandle;
     private final BulkOperation bulkOperation;
     private final SerializedJson jsonNode;
+    private final Event event;
 
     public BulkOperationWrapper(final BulkOperation bulkOperation) {
-        this(bulkOperation, null, null);
+        this(bulkOperation, null, null, null);
     }
 
-    public BulkOperationWrapper(final BulkOperation bulkOperation, final EventHandle eventHandle, final SerializedJson jsonNode) {
+    public BulkOperationWrapper(final BulkOperation bulkOperation, final EventHandle eventHandle, final SerializedJson jsonNode, final Event event) {
         checkNotNull(bulkOperation);
         this.bulkOperation = bulkOperation;
         this.eventHandle = eventHandle;
         this.jsonNode = jsonNode;
+        this.event = event;
     }
 
     public BulkOperationWrapper(final BulkOperation bulkOperation, final EventHandle eventHandle) {
-        this(bulkOperation, eventHandle, null);
+        this(bulkOperation, eventHandle, null, null);
     }
 
     public BulkOperation getBulkOperation() {
         return bulkOperation;
+    }
+
+    public Event getEvent() {
+        return event;
     }
 
     public EventHandle getEventHandle() {

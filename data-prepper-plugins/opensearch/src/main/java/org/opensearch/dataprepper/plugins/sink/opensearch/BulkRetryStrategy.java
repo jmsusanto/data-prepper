@@ -15,6 +15,7 @@ import org.opensearch.client.opensearch.core.BulkResponse;
 import org.opensearch.client.opensearch.core.bulk.BulkResponseItem;
 import org.opensearch.dataprepper.metrics.PluginMetrics;
 import org.opensearch.dataprepper.model.configuration.PluginSetting;
+import org.opensearch.dataprepper.plugins.processor.model.event.EventWrapper;
 import org.opensearch.dataprepper.plugins.sink.opensearch.bulk.AccumulatingBulkRequest;
 import org.opensearch.dataprepper.plugins.sink.opensearch.dlq.FailedBulkOperation;
 import org.opensearch.rest.RestStatus;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -185,21 +187,23 @@ public final class BulkRetryStrategy {
         }
     }
 
-    public void execute(final AccumulatingBulkRequest bulkRequest) throws InterruptedException {
+    public List<EventWrapper> execute(final AccumulatingBulkRequest bulkRequest) throws InterruptedException {
+        final List<EventWrapper> eventWrappers = new ArrayList<>();
+
         final Backoff backoff = Backoff.exponential(INITIAL_DELAY_MS, MAXIMUM_DELAY_MS).withMaxAttempts(maxRetries);
         BulkOperationRequestResponse operationResponse;
         BulkResponse response = null;
         AccumulatingBulkRequest request = bulkRequest;
         int attempt = 1;
         do {
-            operationResponse = handleRetry(request, response, attempt);
+            operationResponse = handleRetry(request, response, attempt, eventWrappers);
             if (operationResponse != null) {
                 final long delayMillis = backoff.nextDelayMillis(attempt++);
                 request = operationResponse.getBulkRequest();
                 response = operationResponse.getResponse();
                 if (delayMillis < 0) {
                     RuntimeException e = new RuntimeException(String.format("Number of retries reached the limit of max retries (configured value %d)", maxRetries));
-                    handleFailures(request, null, e);
+                    handleFailures(request, null, e, eventWrappers);
                     break;
                 }
                 // Wait for backOff duration
@@ -210,6 +214,8 @@ public final class BulkRetryStrategy {
                 }
             }
         } while (operationResponse != null);
+
+        return eventWrappers;
     }
 
     public boolean canRetry(final BulkResponse response) {
@@ -230,7 +236,8 @@ public final class BulkRetryStrategy {
     private BulkOperationRequestResponse handleRetriesAndFailures(final AccumulatingBulkRequest bulkRequestForRetry,
                                                                   final int retryCount,
                                                                   final BulkResponse bulkResponse,
-                                                                  final Exception exceptionFromRequest) {
+                                                                  final Exception exceptionFromRequest,
+                                                                  final List<EventWrapper> eventWrappers) {
         final boolean doRetry = (Objects.isNull(exceptionFromRequest)) ? canRetry(bulkResponse) : canRetry(exceptionFromRequest);
         if (!Objects.isNull(bulkResponse) && retryCount == 1) { // first attempt
             for (final BulkResponseItem bulkItemResponse : bulkResponse.items()) {
@@ -253,12 +260,13 @@ public final class BulkRetryStrategy {
             bulkRequestNumberOfRetries.increment();
             return new BulkOperationRequestResponse(bulkRequestForRetry, bulkResponse);
         } else {
-            handleFailures(bulkRequestForRetry, bulkResponse, exceptionFromRequest);
+            handleFailures(bulkRequestForRetry, bulkResponse, exceptionFromRequest, eventWrappers);
         }
         return null;
     }
 
-    private void handleFailures(final AccumulatingBulkRequest<BulkOperationWrapper, BulkRequest> bulkRequest, final BulkResponse bulkResponse, final Throwable failure) {
+    private void handleFailures(final AccumulatingBulkRequest<BulkOperationWrapper, BulkRequest> bulkRequest, final BulkResponse bulkResponse, final Throwable failure,
+                                final List<EventWrapper> eventWrappers) {
         if (failure == null) {
             for (final BulkResponseItem bulkItemResponse : bulkResponse.items()) {
                 // Skip logging the error for version conflicts
@@ -266,7 +274,7 @@ public final class BulkRetryStrategy {
                     LOG.warn("operation = {}, error = {}", bulkItemResponse.operationType(), bulkItemResponse.error().reason());
                 }
             }
-            handleFailures(bulkRequest, bulkResponse.items());
+            handleFailures(bulkRequest, bulkResponse.items(), eventWrappers);
         } else {
             LOG.warn("Bulk Operation Failed.", failure);
             handleFailures(bulkRequest, failure);
@@ -274,8 +282,9 @@ public final class BulkRetryStrategy {
         bulkRequestFailedCounter.increment();
     }
 
-    private BulkOperationRequestResponse handleRetry(final AccumulatingBulkRequest request, final BulkResponse response, int retryCount) throws InterruptedException {
-        final AccumulatingBulkRequest<BulkOperationWrapper, BulkRequest> bulkRequestForRetry = createBulkRequestForRetry(request, response);
+    private BulkOperationRequestResponse handleRetry(final AccumulatingBulkRequest request, final BulkResponse response, int retryCount,
+                                                     final List<EventWrapper> eventWrappers) throws InterruptedException {
+        final AccumulatingBulkRequest<BulkOperationWrapper, BulkRequest> bulkRequestForRetry = createBulkRequestForRetry(request, response, eventWrappers);
         if (bulkRequestForRetry.getOperationsCount() == 0) {
             return null;
         }
@@ -285,10 +294,10 @@ public final class BulkRetryStrategy {
             bulkResponse = requestFunction.apply(bulkRequestForRetry);
         } catch (Exception e) {
             incrementErrorCounters(e);
-            return handleRetriesAndFailures(bulkRequestForRetry, retryCount, null, e);
+            return handleRetriesAndFailures(bulkRequestForRetry, retryCount, null, e, eventWrappers);
         }
         if (bulkResponse.errors()) {
-            return handleRetriesAndFailures(bulkRequestForRetry, retryCount, bulkResponse, null);
+            return handleRetriesAndFailures(bulkRequestForRetry, retryCount, bulkResponse, null, eventWrappers);
         } else {
             final int numberOfDocs = bulkRequestForRetry.getOperationsCount();
             final boolean firstAttempt = (retryCount == 1);
@@ -296,15 +305,19 @@ public final class BulkRetryStrategy {
                 sentDocumentsOnFirstAttemptCounter.increment(numberOfDocs);
             }
             sentDocumentsCounter.increment(bulkRequestForRetry.getOperationsCount());
-            for (final BulkOperationWrapper bulkOperation: bulkRequestForRetry.getOperations()) {
+            for (int i = 0; i < bulkResponse.items().size(); i++) {
+                final BulkOperationWrapper bulkOperation = bulkRequestForRetry.getOperationAt(i);
+                final BulkResponseItem bulkResponseItem = bulkResponse.items().get(i);
+
                 bulkOperation.releaseEventHandle(true);
+                eventWrappers.add(createEventWrapper(bulkOperation, bulkResponseItem));
             }
         }
         return null;
     }
 
     private AccumulatingBulkRequest<BulkOperationWrapper, BulkRequest> createBulkRequestForRetry(
-            final AccumulatingBulkRequest<BulkOperationWrapper, BulkRequest> request, final BulkResponse response) {
+            final AccumulatingBulkRequest<BulkOperationWrapper, BulkRequest> request, final BulkResponse response, final List<EventWrapper> eventWrappers) {
         if (response == null) {
             // first attempt or retry due to Exception
             return request;
@@ -322,6 +335,7 @@ public final class BulkRetryStrategy {
                         documentsVersionConflictErrors.increment();
                         LOG.debug("Received version conflict from OpenSearch: {}", bulkItemResponse.error().reason());
                         bulkOperation.releaseEventHandle(true);
+                        eventWrappers.add(createEventWrapper(bulkOperation, bulkItemResponse));
                     } else {
                         nonRetryableFailures.add(FailedBulkOperation.builder()
                                 .withBulkOperation(bulkOperation)
@@ -332,6 +346,7 @@ public final class BulkRetryStrategy {
                 } else {
                     sentDocumentsCounter.increment();
                     bulkOperation.releaseEventHandle(true);
+                    eventWrappers.add(createEventWrapper(bulkOperation, bulkItemResponse));
                 }
                 index++;
             }
@@ -343,7 +358,8 @@ public final class BulkRetryStrategy {
         }
     }
 
-    private void handleFailures(final AccumulatingBulkRequest<BulkOperationWrapper, BulkRequest> accumulatingBulkRequest, final List<BulkResponseItem> itemResponses) {
+    private void handleFailures(final AccumulatingBulkRequest<BulkOperationWrapper, BulkRequest> accumulatingBulkRequest, final List<BulkResponseItem> itemResponses,
+                                final List<EventWrapper> eventWrappers) {
         assert accumulatingBulkRequest.getOperationsCount() == itemResponses.size();
         final ImmutableList.Builder<FailedBulkOperation> failures = ImmutableList.builder();
         for (int i = 0; i < itemResponses.size(); i++) {
@@ -354,6 +370,7 @@ public final class BulkRetryStrategy {
                     documentsVersionConflictErrors.increment();
                     LOG.debug("Received version conflict from OpenSearch: {}", bulkItemResponse.error().reason());
                     bulkOperation.releaseEventHandle(true);
+                    eventWrappers.add(createEventWrapper(bulkOperation, bulkItemResponse));
                 } else {
                     failures.add(FailedBulkOperation.builder()
                             .withBulkOperation(bulkOperation)
@@ -364,6 +381,7 @@ public final class BulkRetryStrategy {
             } else {
                 sentDocumentsCounter.increment();
                 bulkOperation.releaseEventHandle(true);
+                eventWrappers.add(createEventWrapper(bulkOperation, bulkItemResponse));
             }
         }
         logFailure.accept(failures.build(), null);
@@ -382,6 +400,10 @@ public final class BulkRetryStrategy {
         }
 
         logFailure.accept(failures.build(), failure);
+    }
+
+    private EventWrapper createEventWrapper(final BulkOperationWrapper bulkOperationWrapper, final BulkResponseItem bulkResponseItem) {
+        return new EventWrapper(bulkResponseItem.index(), bulkResponseItem.id(), bulkOperationWrapper.getEvent());
     }
 
 }
