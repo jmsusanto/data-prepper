@@ -18,6 +18,9 @@ dependencies {
         exclude group: 'org.glassfish', module: 'javax.json'
     }
     implementation project(':data-prepper-api')
+    implementation project(':data-prepper-plugins:common')
+    implementation project(':data-prepper-plugins:aws-plugin-api')
+    implementation project(':data-prepper-plugins:opensearch')
     implementation 'javax.inject:javax.inject:1'
     implementation(libs.spring.core) {
         exclude group: 'commons-logging', module: 'commons-logging'
@@ -32,6 +35,7 @@ dependencies {
     implementation libs.opensearch.client
     implementation libs.opensearch.rhlc
     implementation libs.opensearch.java
+    implementation 'com.fasterxml.jackson.core:jackson-core'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation libs.commons.lang3
 }
@@ -57,3 +61,8 @@ jacocoTestCoverageVerification {
         }))
     }
 }
+
+checkstyleMain {
+    source = fileTree('src/main/java')
+}
+

@@ -11,7 +11,6 @@ dependencies {
     implementation project(':data-prepper-plugins:buffer-common')
     implementation project(':data-prepper-plugins:common')
     implementation project(':data-prepper-plugins:failures-common')
-    implementation project(':data-prepper-plugins:rule-engine')
     implementation libs.opensearch.client
     implementation libs.opensearch.rhlc
     implementation libs.opensearch.java

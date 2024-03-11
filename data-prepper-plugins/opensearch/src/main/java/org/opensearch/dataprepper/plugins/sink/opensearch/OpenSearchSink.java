@@ -45,9 +45,6 @@ import org.opensearch.dataprepper.plugins.common.opensearch.ServerlessNetworkPol
 import org.opensearch.dataprepper.plugins.common.opensearch.ServerlessOptionsFactory;
 import org.opensearch.dataprepper.plugins.dlq.DlqProvider;
 import org.opensearch.dataprepper.plugins.dlq.DlqWriter;
-import org.opensearch.dataprepper.plugins.processor.RuleEngine;
-import org.opensearch.dataprepper.plugins.processor.RuleEngineConfig;
-import org.opensearch.dataprepper.plugins.processor.model.event.EventWrapper;
 import org.opensearch.dataprepper.plugins.sink.opensearch.bulk.AccumulatingBulkRequest;
 import org.opensearch.dataprepper.plugins.sink.opensearch.bulk.BulkApiWrapper;
 import org.opensearch.dataprepper.plugins.sink.opensearch.bulk.BulkApiWrapperFactory;
@@ -75,7 +72,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -143,7 +139,6 @@ public class OpenSearchSink extends AbstractSink<Record<Event>> {
   private DlqProvider dlqProvider;
   private final ConcurrentHashMap<Long, AccumulatingBulkRequest<BulkOperationWrapper, BulkRequest>> bulkRequestMap;
   private final ConcurrentHashMap<Long, Long> lastFlushTimeMap;
-  private RuleEngine ruleEngine = null;
 
   @DataPrepperPluginConstructor
   public OpenSearchSink(final PluginSetting pluginSetting,
@@ -266,9 +261,6 @@ public class OpenSearchSink extends AbstractSink<Record<Event>> {
     maybeUpdateServerlessNetworkPolicy();
 
     objectMapper = new ObjectMapper();
-
-    final Optional<RuleEngineConfig> ruleEngineConfig = openSearchSinkConfig.getRuleEngineConfig();
-    ruleEngineConfig.ifPresent(engineConfig -> ruleEngine = new RuleEngine(engineConfig, openSearchClient));
 
     this.initialized = true;
     LOG.info("Initialized OpenSearch sink");
@@ -503,10 +495,7 @@ public class OpenSearchSink extends AbstractSink<Record<Event>> {
     bulkRequestTimer.record(() -> {
       try {
         LOG.debug("Sending data to OpenSearch");
-        final List<EventWrapper> eventWrappers = bulkRetryStrategy.execute(accumulatingBulkRequest);
-        if (ruleEngine != null) {
-          ruleEngine.doExecute(eventWrappers);
-        }
+        bulkRetryStrategy.execute(accumulatingBulkRequest);
         bulkRequestSizeBytesSummary.record(accumulatingBulkRequest.getEstimatedSizeInBytes());
       } catch (final InterruptedException e) {
         LOG.error("Unexpected Interrupt:", e);

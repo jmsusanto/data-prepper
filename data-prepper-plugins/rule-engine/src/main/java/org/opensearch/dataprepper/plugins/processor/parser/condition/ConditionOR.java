@@ -4,7 +4,6 @@
  */
 package org.opensearch.dataprepper.plugins.processor.parser.condition;
 
-import org.opensearch.dataprepper.plugins.processor.parser.utils.AnyOneOf;
 import org.opensearch.dataprepper.plugins.processor.parser.utils.Either;
 
 import java.util.List;

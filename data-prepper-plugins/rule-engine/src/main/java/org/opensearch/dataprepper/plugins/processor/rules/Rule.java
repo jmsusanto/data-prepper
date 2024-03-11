@@ -1,69 +1,29 @@
 package org.opensearch.dataprepper.plugins.processor.rules;
 
-import org.opensearch.dataprepper.model.event.Event;
+import org.opensearch.dataprepper.plugins.processor.model.datatypes.DataType;
 
-import java.util.List;
 import java.util.function.Predicate;
 
-public class Rule {
-    private final String title;
-    private final String id;
-    private final Predicate<Event> condition;
-    private final List<String> tags;
-    private final String query;
-    private String monitorId;
-    private String monitorName;
-    private String findingsIndex;
+public abstract class Rule {
+    private final Predicate<DataType> ruleCondition;
+        private final Predicate<DataType> evaluationCondition;
 
-    public Rule(final String title, final String id, final Predicate<Event> condition, final List<String> tags) {
-        this.title = title;
-        this.id = id;
-        this.condition = condition;
-        this.tags = tags;
-        this.query = "PLACEHOLDER_QUERY";
+    public Rule(final Predicate<DataType> ruleCondition, final Predicate<DataType> evaluationCondition) {
+        this.ruleCondition = ruleCondition;
+        this.evaluationCondition = evaluationCondition;
     }
 
-    public String getTitle() {
-        return title;
+    // Helper for always evaluate rules
+    public Rule(final Predicate<DataType> ruleCondition) {
+        this.ruleCondition = ruleCondition;
+        this.evaluationCondition = i -> true;
     }
 
-    public String getId() {
-        return id;
+    public Predicate<DataType> getRuleCondition() {
+        return ruleCondition;
     }
 
-    public Predicate<Event> getCondition() {
-        return condition;
-    }
-
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public String getQuery() {
-        return query;
-    }
-
-    public String getMonitorId() {
-        return monitorId;
-    }
-
-    public String getMonitorName() {
-        return monitorName;
-    }
-
-    public String getFindingsIndex() {
-        return findingsIndex;
-    }
-
-    public void setMonitorId(final String monitorId) {
-        this.monitorId = monitorId;
-    }
-
-    public void setMonitorName(String monitorName) {
-        this.monitorName = monitorName;
-    }
-
-    public void setFindingsIndex(final String findingsIndex) {
-        this.findingsIndex = findingsIndex;
+    public Predicate<DataType> getEvaluationCondition() {
+        return evaluationCondition;
     }
 }

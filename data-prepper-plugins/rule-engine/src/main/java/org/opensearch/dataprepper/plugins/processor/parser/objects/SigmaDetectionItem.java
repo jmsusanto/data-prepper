@@ -20,7 +20,6 @@ import org.opensearch.dataprepper.plugins.processor.parser.modifiers.SigmaValueM
 import org.opensearch.dataprepper.plugins.processor.parser.types.SigmaNull;
 import org.opensearch.dataprepper.plugins.processor.parser.types.SigmaType;
 import org.opensearch.dataprepper.plugins.processor.parser.types.SigmaTypeFacade;
-import org.opensearch.dataprepper.plugins.processor.parser.utils.AnyOneOf;
 import org.opensearch.dataprepper.plugins.processor.parser.utils.Either;
 
 import java.util.ArrayList;

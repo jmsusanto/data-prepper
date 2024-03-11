@@ -13,7 +13,6 @@ import org.opensearch.dataprepper.plugins.processor.parser.condition.ConditionSe
 import org.opensearch.dataprepper.plugins.processor.parser.condition.ConditionTraverseVisitor;
 import org.opensearch.dataprepper.plugins.processor.parser.condition.ConditionValueExpression;
 import org.opensearch.dataprepper.plugins.processor.parser.exceptions.SigmaConditionError;
-import org.opensearch.dataprepper.plugins.processor.parser.utils.AnyOneOf;
 import org.opensearch.dataprepper.plugins.processor.parser.utils.Either;
 import org.opensearch.dataprepper.plugins.processor.rules.antlr.ConditionLexer;
 import org.opensearch.dataprepper.plugins.processor.rules.antlr.ConditionParser;

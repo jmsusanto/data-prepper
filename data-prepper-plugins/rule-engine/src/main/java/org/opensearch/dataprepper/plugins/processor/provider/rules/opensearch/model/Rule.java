@@ -1,4 +1,4 @@
-package org.opensearch.dataprepper.plugins.processor.model.rule;
+package org.opensearch.dataprepper.plugins.processor.provider.rules.opensearch.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

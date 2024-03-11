@@ -1,4 +1,4 @@
-package org.opensearch.dataprepper.plugins.processor.model.rule;
+package org.opensearch.dataprepper.plugins.processor.provider.rules.opensearch.model;
 
 public class RuleWrapper {
     private Rule rule;

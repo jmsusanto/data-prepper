@@ -1,22 +1,21 @@
 package org.opensearch.dataprepper.plugins.processor.rules;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 // TODO - does this need locking?
 public class RuleStore {
-    private Map<String, List<Rule>> rules;
+    private List<Rule> rules;
 
     public RuleStore() {
-        this.rules = new HashMap<>();
+        this.rules = new ArrayList<>();
     }
 
-    public void updateRuleStore(final Map<String, List<Rule>> updatedRules) {
+    public void updateRuleStore(final List<Rule> updatedRules) {
         rules = updatedRules;
     }
 
-    public Map<String, List<Rule>> getRules() {
+    public List<Rule> getRules() {
         return rules;
     }
 }

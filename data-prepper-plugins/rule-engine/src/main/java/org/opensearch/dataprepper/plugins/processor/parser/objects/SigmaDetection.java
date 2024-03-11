@@ -14,7 +14,6 @@ import org.opensearch.dataprepper.plugins.processor.parser.exceptions.SigmaDetec
 import org.opensearch.dataprepper.plugins.processor.parser.exceptions.SigmaModifierError;
 import org.opensearch.dataprepper.plugins.processor.parser.exceptions.SigmaRegularExpressionError;
 import org.opensearch.dataprepper.plugins.processor.parser.exceptions.SigmaValueError;
-import org.opensearch.dataprepper.plugins.processor.parser.utils.AnyOneOf;
 import org.opensearch.dataprepper.plugins.processor.parser.utils.Either;
 
 import java.util.ArrayList;
