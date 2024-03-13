@@ -6,7 +6,7 @@ import java.util.function.Predicate;
 
 public abstract class Rule {
     private final Predicate<DataType> ruleCondition;
-        private final Predicate<DataType> evaluationCondition;
+    private final Predicate<DataType> evaluationCondition;
 
     public Rule(final Predicate<DataType> ruleCondition, final Predicate<DataType> evaluationCondition) {
         this.ruleCondition = ruleCondition;
