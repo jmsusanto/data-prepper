@@ -301,6 +301,7 @@ public final class BulkRetryStrategy {
                 final BulkResponseItem bulkResponseItem = bulkResponse.items().get(i);
 
                 bulkOperation.releaseEventHandle(true);
+                executeConsumer(bulkOperation, bulkResponseItem);
             }
         }
         return null;
@@ -325,6 +326,7 @@ public final class BulkRetryStrategy {
                         documentsVersionConflictErrors.increment();
                         LOG.debug("Received version conflict from OpenSearch: {}", bulkItemResponse.error().reason());
                         bulkOperation.releaseEventHandle(true);
+                        executeConsumer(bulkOperation, bulkItemResponse);
                     } else {
                         nonRetryableFailures.add(FailedBulkOperation.builder()
                                 .withBulkOperation(bulkOperation)
@@ -335,6 +337,7 @@ public final class BulkRetryStrategy {
                 } else {
                     sentDocumentsCounter.increment();
                     bulkOperation.releaseEventHandle(true);
+                    executeConsumer(bulkOperation, bulkItemResponse);
                 }
                 index++;
             }
@@ -357,6 +360,7 @@ public final class BulkRetryStrategy {
                     documentsVersionConflictErrors.increment();
                     LOG.debug("Received version conflict from OpenSearch: {}", bulkItemResponse.error().reason());
                     bulkOperation.releaseEventHandle(true);
+                    executeConsumer(bulkOperation, bulkItemResponse);
                 } else {
                     failures.add(FailedBulkOperation.builder()
                             .withBulkOperation(bulkOperation)
@@ -367,6 +371,7 @@ public final class BulkRetryStrategy {
             } else {
                 sentDocumentsCounter.increment();
                 bulkOperation.releaseEventHandle(true);
+                executeConsumer(bulkOperation, bulkItemResponse);
             }
         }
         logFailure.accept(failures.build(), null);
@@ -385,6 +390,14 @@ public final class BulkRetryStrategy {
         }
 
         logFailure.accept(failures.build(), failure);
+    }
+
+    private void executeConsumer(final BulkOperationWrapper bulkOperationWrapper, final BulkResponseItem bulkResponseItem) {
+        if (bulkOperationWrapper.getBulkResponseItemConsumer() == null) {
+            return;
+        }
+
+        bulkOperationWrapper.getBulkResponseItemConsumer().accept(bulkResponseItem);
     }
 
 }

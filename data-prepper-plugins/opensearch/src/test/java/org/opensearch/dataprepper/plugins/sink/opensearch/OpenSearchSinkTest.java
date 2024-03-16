@@ -253,7 +253,7 @@ public class OpenSearchSinkTest {
                 .withEventType("event")
                 .withData(Collections.singletonMap(routingFieldKey, routingFieldValue))
                 .build();
-        assertThat(objectUnderTest.getDocument(event).getRoutingField(), equalTo(Optional.of(routingFieldValue)));
+        assertThat(objectUnderTest.getDocument(event, null).getRoutingField(), equalTo(Optional.of(routingFieldValue)));
 
     }
 
@@ -266,11 +266,11 @@ public class OpenSearchSinkTest {
                 .withEventType("event")
                 .withData(Collections.singletonMap(routingKey, routingValue))
                 .build();
-        assertThat(objectUnderTest.getDocument(event).getRoutingField(), equalTo(Optional.empty()));
+        assertThat(objectUnderTest.getDocument(event, null).getRoutingField(), equalTo(Optional.empty()));
 
         when(indexConfiguration.getRouting()).thenReturn("${"+routingKey+"}");
         final OpenSearchSink objectUnderTest2 = createObjectUnderTest();
-        assertThat(objectUnderTest2.getDocument(event).getRoutingField(), equalTo(Optional.of(routingValue)));
+        assertThat(objectUnderTest2.getDocument(event, null).getRoutingField(), equalTo(Optional.of(routingValue)));
     }
 
     @Test

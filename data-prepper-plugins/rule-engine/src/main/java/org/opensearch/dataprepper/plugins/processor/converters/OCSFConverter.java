@@ -3,13 +3,14 @@ package org.opensearch.dataprepper.plugins.processor.converters;
 import org.opensearch.dataprepper.model.event.Event;
 import org.opensearch.dataprepper.model.record.Record;
 import org.opensearch.dataprepper.plugins.processor.model.datatypes.OCSF;
+import org.opensearch.dataprepper.plugins.processor.util.OpenSearchDocMetadata;
 
 import java.util.Map;
 
 public class OCSFConverter {
-    public OCSF convert(final Record<Event> record) {
+    public OCSF convert(final String id, final Record<Event> record) {
         final Event event = record.getData();
-        return OCSF.builder()
+        final OCSF ocsf = OCSF.builder()
                 .metadataProductVersion(event.get("/metadata/product/version", String.class))
                 .metadataProductName(event.get("/metadata/product/name", String.class))
                 .metadataProductVendorName(event.get("/metadata/product/vendor_name", String.class))
@@ -59,5 +60,8 @@ public class OCSFConverter {
                 .actorIdpName(event.get("/actor/idp/name", String.class))
                 .unmapped((Map<String, String>) event.get("/unmapped", Map.class))
                 .build();
+
+        ocsf.putMetadataValue(OpenSearchDocMetadata.RULE_ENGINE_ID.getFieldName(), id);
+        return ocsf;
     }
 }

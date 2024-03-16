@@ -5,6 +5,7 @@
 
 package org.opensearch.dataprepper.plugins.sink.opensearch;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequestInterceptor;
@@ -356,6 +357,7 @@ public class ConnectionConfiguration {
     );
   }
 
+  @JsonIgnore
   private void setHttpProxyIfApplicable(final HttpAsyncClientBuilder httpClientBuilder) {
     proxy.ifPresent(
             p -> {
@@ -475,6 +477,7 @@ public class ConnectionConfiguration {
     }
   }
 
+  @JsonIgnore
   private void setHttpProxyIfApplicable(final ApacheHttpClient.Builder apacheHttpClientBuilder) {
     proxy.ifPresent(
             p -> {

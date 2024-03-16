@@ -7,6 +7,7 @@ import org.opensearch.dataprepper.plugins.processor.model.log.LogFormat;
 import org.opensearch.dataprepper.plugins.processor.model.rule.RuleSchema;
 
 import java.time.Duration;
+import java.util.Map;
 
 public class RuleEngineProcessorConfig {
     static final Duration DEFAULT_RULE_REFRESH_INTERVAL = Duration.ofMinutes(1);
@@ -32,6 +33,9 @@ public class RuleEngineProcessorConfig {
     @NotNull
     private String ruleLocation;
 
+    @JsonProperty("opensearch_config")
+    private Map<String, Object> openSearchConfiguration;
+
     @JsonProperty("drop_data")
     private boolean dropData = false;
 
@@ -53,6 +57,10 @@ public class RuleEngineProcessorConfig {
 
     public String getRuleLocation() {
         return ruleLocation;
+    }
+
+    public Map<String, Object> getOpenSearchConfiguration() {
+        return openSearchConfiguration;
     }
 
     public boolean isDropData() {

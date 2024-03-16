@@ -16,6 +16,7 @@ import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.VersionType;
 import org.opensearch.client.opensearch.core.BulkRequest;
 import org.opensearch.client.opensearch.core.bulk.BulkOperation;
+import org.opensearch.client.opensearch.core.bulk.BulkResponseItem;
 import org.opensearch.client.opensearch.core.bulk.CreateOperation;
 import org.opensearch.client.opensearch.core.bulk.DeleteOperation;
 import org.opensearch.client.opensearch.core.bulk.IndexOperation;
@@ -72,8 +73,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -81,6 +84,7 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -359,6 +363,9 @@ public class OpenSearchSink extends AbstractSink<Record<Event>> {
 
   @Override
   public void doOutput(final Collection<Record<Event>> records) {
+    final Map<String, List<String>> ruleEngineIdToDocId = new HashMap<>();
+    final List<Record<Event>> findings = new ArrayList<>();
+
     final long threadId = Thread.currentThread().getId();
     if (!bulkRequestMap.containsKey(threadId)) {
       bulkRequestMap.put(threadId, bulkRequestSupplier.get());
@@ -372,76 +379,70 @@ public class OpenSearchSink extends AbstractSink<Record<Event>> {
 
     for (final Record<Event> record : records) {
       final Event event = record.getData();
-      final SerializedJson document = getDocument(event);
-      String indexName = configuredIndexAlias;
-      try {
-          indexName = indexManager.getIndexName(event.formatString(indexName, expressionEvaluator));
-      } catch (final Exception e) {
-          LOG.error("There was an exception when constructing the index name. Check the dlq if configured to see details about the affected Event: {}", e.getMessage());
-          dynamicIndexDroppedEvents.increment();
-          logFailureForDlqObjects(List.of(createDlqObjectFromEvent(event, indexName, e.getMessage())), e);
-          continue;
-      }
-
-      Long version = null;
-      String versionExpressionEvaluationResult = null;
-      if (versionExpression != null) {
-        try {
-          versionExpressionEvaluationResult = event.formatString(versionExpression, expressionEvaluator);
-          version = Long.valueOf(event.formatString(versionExpression, expressionEvaluator));
-        } catch (final NumberFormatException e) {
-          final String errorMessage = String.format(
-                  "Unable to convert the result of evaluating document_version '%s' to Long for an Event. The evaluation result '%s' must be a valid Long type", versionExpression, versionExpressionEvaluationResult
-          );
-          LOG.error(errorMessage);
-          logFailureForDlqObjects(List.of(createDlqObjectFromEvent(event, indexName, errorMessage)), e);
-          dynamicDocumentVersionDroppedEvents.increment();
-        } catch (final RuntimeException e) {
-          final String errorMessage = String.format(
-                  "There was an exception when evaluating the document_version '%s': %s", versionExpression, e.getMessage());
-          LOG.error(errorMessage + " Check the dlq if configured to see more details about the affected Event");
-          logFailureForDlqObjects(List.of(createDlqObjectFromEvent(event, indexName, errorMessage)), e);
-          dynamicDocumentVersionDroppedEvents.increment();
-        }
-      }
-
-      String eventAction = action;
-      if (actions != null) {
-        for (final Map<String, Object> actionEntry: actions) {
-            final String condition = (String)actionEntry.get("when");
-            eventAction = (String)actionEntry.get("type");
-            if (condition != null &&
-                expressionEvaluator.evaluateConditional(condition, event)) {
-                    break;
-            }
-        }
-      }
-      if (eventAction.contains("${")) {
-          eventAction = event.formatString(eventAction, expressionEvaluator);
-      }
-      if (OpenSearchBulkActions.fromOptionValue(eventAction) == null) {
-        LOG.error("Unknown action {}, skipping the event", eventAction);
-        invalidActionErrorsCounter.increment();
+      // Save the findings for last to ensure doc IDs are generated for the original data
+      if (event.containsKey("RULE_ENGINE_DOC_MATCH_ID")) {
+        findings.add(record);
         continue;
       }
 
-      SerializedJson serializedJsonNode = null;
-      if (StringUtils.equals(action, OpenSearchBulkActions.UPDATE.toString()) ||
-          StringUtils.equals(action, OpenSearchBulkActions.UPSERT.toString()) ||
-          StringUtils.equals(action, OpenSearchBulkActions.DELETE.toString())) {
-            serializedJsonNode = SerializedJson.fromJsonNode(event.getJsonNode(), document);
-      }
-      BulkOperation bulkOperation;
+      final Consumer<BulkResponseItem> bulkResponseItemConsumer = getBulkResponseItemConsumer(ruleEngineIdToDocId, event.get("RULE_ENGINE_ID", String.class));
+      event.delete("RULE_ENGINE_ID");
 
+      String indexName = configuredIndexAlias;
       try {
-        bulkOperation = getBulkOperationForAction(eventAction, document, version, indexName, event.getJsonNode());
+        indexName = indexManager.getIndexName(event.formatString(indexName, expressionEvaluator));
       } catch (final Exception e) {
-        LOG.error("An exception occurred while constructing the bulk operation for a document: ", e);
+        LOG.error("There was an exception when constructing the index name. Check the dlq if configured to see details about the affected Event: {}", e.getMessage());
+        dynamicIndexDroppedEvents.increment();
         logFailureForDlqObjects(List.of(createDlqObjectFromEvent(event, indexName, e.getMessage())), e);
         continue;
       }
 
-      BulkOperationWrapper bulkOperationWrapper = new BulkOperationWrapper(bulkOperation, event.getEventHandle(), serializedJsonNode, event);
+      final BulkOperationWrapper bulkOperationWrapper;
+      try {
+        bulkOperationWrapper = createBulkOperationWrapper(event, bulkResponseItemConsumer, indexName, null);
+      } catch (final Exception e) {
+        continue;
+      }
+
+      final long estimatedBytesBeforeAdd = bulkRequest.estimateSizeInBytesWithDocument(bulkOperationWrapper);
+      if (bulkSize >= 0 && estimatedBytesBeforeAdd >= bulkSize && bulkRequest.getOperationsCount() > 0) {
+        flushBatch(bulkRequest);
+        lastFlushTime = System.currentTimeMillis();
+        bulkRequest = bulkRequestSupplier.get();
+      }
+      bulkRequest.addOperation(bulkOperationWrapper);
+    }
+
+    if (bulkRequest.getOperationsCount() > 0) {
+      flushBatch(bulkRequest);
+      lastFlushTime = System.currentTimeMillis();
+      bulkRequest = bulkRequestSupplier.get();
+    }
+
+    // Here down is findings shipping
+    for (final Record<Event> record : findings) {
+      final Event event = record.getData();
+      final String ruleEngineId = event.get("RULE_ENGINE_DOC_MATCH_ID", String.class);
+      final String docId = ruleEngineIdToDocId.get(ruleEngineId).get(0);
+      final String docIndexName = ruleEngineIdToDocId.get(ruleEngineId).get(1);
+      final List<String> replacementFields = event.getList("RULE_ENGINE_DOC_ID_REPLACEMENT_FIELDS", String.class);
+      final String indexName = event.get("FINDINGS_INDEX_NAME", String.class);
+
+      event.put("index", docIndexName);
+      replacementFields.forEach(field -> event.put(field, docId == null ? Collections.emptyList() : List.of(docId)));
+
+      event.delete("RULE_ENGINE_DOC_MATCH_ID");
+      event.delete("RULE_ENGINE_DOC_ID_REPLACEMENT_FIELDS");
+      event.delete("FINDINGS_INDEX_NAME");
+
+      final BulkOperationWrapper bulkOperationWrapper;
+      try {
+        bulkOperationWrapper = createBulkOperationWrapper(event, null, indexName, event.get("id", String.class));
+      } catch (final Exception e) {
+        continue;
+      }
+
       final long estimatedBytesBeforeAdd = bulkRequest.estimateSizeInBytesWithDocument(bulkOperationWrapper);
       if (bulkSize >= 0 && estimatedBytesBeforeAdd >= bulkSize && bulkRequest.getOperationsCount() > 0) {
         flushBatch(bulkRequest);
@@ -462,18 +463,73 @@ public class OpenSearchSink extends AbstractSink<Record<Event>> {
     lastFlushTimeMap.put(threadId, lastFlushTime);
   }
 
-  SerializedJson getDocument(final Event event) {
-    String docId = null;
+  private BulkOperationWrapper createBulkOperationWrapper(final Event event, final Consumer<BulkResponseItem> bulkResponseItemConsumer,
+                                                          final String indexName, final String docId) {
+    final SerializedJson document = getDocument(event, docId);
 
-    if (Objects.nonNull(documentIdField)) {
-      docId = event.get(documentIdField, String.class);
-    } else if (Objects.nonNull(documentId)) {
+    Long version = null;
+    String versionExpressionEvaluationResult = null;
+    if (versionExpression != null) {
       try {
-        docId = event.formatString(documentId, expressionEvaluator);
-      } catch (final ExpressionEvaluationException | EventKeyNotFoundException e) {
-        LOG.error("Unable to construct document_id with format {}, the document_id will be generated by OpenSearch", documentId, e);
+        versionExpressionEvaluationResult = event.formatString(versionExpression, expressionEvaluator);
+        version = Long.valueOf(event.formatString(versionExpression, expressionEvaluator));
+      } catch (final NumberFormatException e) {
+        final String errorMessage = String.format(
+                "Unable to convert the result of evaluating document_version '%s' to Long for an Event. The evaluation result '%s' must be a valid Long type", versionExpression, versionExpressionEvaluationResult
+        );
+        LOG.error(errorMessage);
+        logFailureForDlqObjects(List.of(createDlqObjectFromEvent(event, indexName, errorMessage)), e);
+        dynamicDocumentVersionDroppedEvents.increment();
+      } catch (final RuntimeException e) {
+        final String errorMessage = String.format(
+                "There was an exception when evaluating the document_version '%s': %s", versionExpression, e.getMessage());
+        LOG.error(errorMessage + " Check the dlq if configured to see more details about the affected Event");
+        logFailureForDlqObjects(List.of(createDlqObjectFromEvent(event, indexName, errorMessage)), e);
+        dynamicDocumentVersionDroppedEvents.increment();
       }
     }
+
+    String eventAction = action;
+    if (actions != null) {
+      for (final Map<String, Object> actionEntry: actions) {
+        final String condition = (String)actionEntry.get("when");
+        eventAction = (String)actionEntry.get("type");
+        if (condition != null &&
+                expressionEvaluator.evaluateConditional(condition, event)) {
+          break;
+        }
+      }
+    }
+    if (eventAction.contains("${")) {
+      eventAction = event.formatString(eventAction, expressionEvaluator);
+    }
+    if (OpenSearchBulkActions.fromOptionValue(eventAction) == null) {
+      LOG.error("Unknown action {}, skipping the event", eventAction);
+      invalidActionErrorsCounter.increment();
+      throw new RuntimeException();
+    }
+
+    SerializedJson serializedJsonNode = null;
+    if (StringUtils.equals(action, OpenSearchBulkActions.UPDATE.toString()) ||
+            StringUtils.equals(action, OpenSearchBulkActions.UPSERT.toString()) ||
+            StringUtils.equals(action, OpenSearchBulkActions.DELETE.toString())) {
+      serializedJsonNode = SerializedJson.fromJsonNode(event.getJsonNode(), document);
+    }
+    BulkOperation bulkOperation;
+
+    try {
+      bulkOperation = getBulkOperationForAction(eventAction, document, version, indexName, event.getJsonNode());
+    } catch (final Exception e) {
+      LOG.error("An exception occurred while constructing the bulk operation for a document: ", e);
+      logFailureForDlqObjects(List.of(createDlqObjectFromEvent(event, indexName, e.getMessage())), e);
+      throw e;
+    }
+
+    return new BulkOperationWrapper(bulkOperation, event.getEventHandle(), serializedJsonNode, event, bulkResponseItemConsumer);
+  }
+
+  SerializedJson getDocument(final Event event, final String optionalDocId) {
+    String docId = optionalDocId == null ? getDocId(event) : optionalDocId;
 
     String routingValue = null;
     if (routingField != null) {
@@ -489,6 +545,20 @@ public class OpenSearchSink extends AbstractSink<Record<Event>> {
     final String document = DocumentBuilder.build(event, documentRootKey, sinkContext.getTagsTargetKey(), sinkContext.getIncludeKeys(), sinkContext.getExcludeKeys());
 
     return SerializedJson.fromStringAndOptionals(document, docId, routingValue);
+  }
+
+  private String getDocId(final Event event) {
+    if (Objects.nonNull(documentIdField)) {
+      return event.get(documentIdField, String.class);
+    } else if (Objects.nonNull(documentId)) {
+      try {
+        return event.formatString(documentId, expressionEvaluator);
+      } catch (final ExpressionEvaluationException | EventKeyNotFoundException e) {
+        LOG.error("Unable to construct document_id with format {}, the document_id will be generated by OpenSearch", documentId, e);
+      }
+    }
+
+    return null;
   }
 
   private void flushBatch(AccumulatingBulkRequest accumulatingBulkRequest) {
@@ -626,5 +696,12 @@ public class OpenSearchSink extends AbstractSink<Record<Event>> {
             (sinkContext.getIncludeKeys() != null && !sinkContext.getIncludeKeys().isEmpty()) ||
             (sinkContext.getExcludeKeys() != null && !sinkContext.getExcludeKeys().isEmpty()) ||
             sinkContext.getTagsTargetKey() != null;
+  }
+
+  private Consumer<BulkResponseItem> getBulkResponseItemConsumer(final Map<String, List<String>> ruleEngineIdToDocId, final String ruleEngineId) {
+    return bulkResponseItem -> {
+      final String docId = bulkResponseItem.id() == null ? "" : bulkResponseItem.id();
+      ruleEngineIdToDocId.put(ruleEngineId, List.of(docId, bulkResponseItem.index()));
+    };
   }
 }

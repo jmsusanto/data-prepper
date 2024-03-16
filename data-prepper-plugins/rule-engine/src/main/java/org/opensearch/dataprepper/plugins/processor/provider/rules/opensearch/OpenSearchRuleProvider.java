@@ -18,6 +18,7 @@ import org.opensearch.dataprepper.plugins.processor.provider.rules.opensearch.mo
 import org.opensearch.dataprepper.plugins.processor.provider.rules.RuleProvider;
 import org.opensearch.dataprepper.plugins.processor.provider.rules.opensearch.model.Input;
 import org.opensearch.dataprepper.plugins.processor.provider.rules.opensearch.model.RuleWrapper;
+import org.opensearch.dataprepper.plugins.processor.util.OpenSearchDocMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,6 @@ public class OpenSearchRuleProvider implements RuleProvider {
     private static final String DETECTORS_INDEX = ".opensearch-sap-detectors-config";
     private static final String PREPACKAGED_RULES_INDEX = ".opensearch-sap-pre-packaged-rules-config";
     private static final String CUSTOM_RULES_INDEX = ".opensearch-sap-custom-rules-config";
-    private static final String INDEX_FIELD_NAME = "index";
 
     private final OpenSearchClient openSearchClient;
 
@@ -167,7 +167,7 @@ public class OpenSearchRuleProvider implements RuleProvider {
     }
 
     private List<RuleData> buildRules(final Map<Detector, Pair<List<String>, List<String>>> detectorToRuleIds,
-                                  final Map<String, String> ruleIdToRuleAsString) {
+                                      final Map<String, String> ruleIdToRuleAsString) {
         return detectorToRuleIds.entrySet().stream()
                 .map(mapEntry -> buildDetectorRules(mapEntry.getKey(), mapEntry.getValue(), ruleIdToRuleAsString))
                 .flatMap(Collection::stream)
@@ -175,11 +175,16 @@ public class OpenSearchRuleProvider implements RuleProvider {
     }
 
     private List<RuleData> buildDetectorRules(final Detector detector, final Pair<List<String>, List<String>> ruleIdsPair,
-                                          final Map<String, String> ruleIdToRuleAsString) {
+                                              final Map<String, String> ruleIdToRuleAsString) {
         final Predicate<DataType> evaluationCondition = getDetectorEvaluationCondition(detector);
+        final Map<String, String> metadata = Map.of(
+                "monitorId", detector.getMonitorId().get(0),
+                "detectorName", detector.getName(),
+                "findingsIndex", detector.getFindingsIndex()
+        );
 
         return Stream.concat(ruleIdsPair.getLeft().stream(), ruleIdsPair.getRight().stream())
-                .map(ruleId -> new RuleData(ruleIdToRuleAsString.get(ruleId), evaluationCondition))
+                .map(ruleId -> new RuleData(ruleIdToRuleAsString.get(ruleId), evaluationCondition, metadata))
                 .collect(Collectors.toList());
     }
 
@@ -192,7 +197,7 @@ public class OpenSearchRuleProvider implements RuleProvider {
                 .collect(Collectors.toSet());
 
         return dataType -> {
-            final String index = dataType.getMetadataValue(INDEX_FIELD_NAME);
+            final String index = dataType.getMetadataValue(OpenSearchDocMetadata.INDEX.getFieldName());
             if (index == null) {
                 return false;
             }

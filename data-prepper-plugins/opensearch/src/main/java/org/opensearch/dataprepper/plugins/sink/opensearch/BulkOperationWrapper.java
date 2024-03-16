@@ -6,12 +6,14 @@
 package org.opensearch.dataprepper.plugins.sink.opensearch;
 
 import org.opensearch.client.opensearch.core.bulk.BulkOperation;
+import org.opensearch.client.opensearch.core.bulk.BulkResponseItem;
 import org.opensearch.dataprepper.model.event.Event;
 import org.opensearch.dataprepper.model.event.EventHandle;
 import org.opensearch.dataprepper.plugins.sink.opensearch.bulk.SerializedJson;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -44,24 +46,31 @@ public class BulkOperationWrapper {
     );
 
     private final EventHandle eventHandle;
+    private final Consumer<BulkResponseItem> bulkResponseItemConsumer;
     private final BulkOperation bulkOperation;
     private final SerializedJson jsonNode;
     private final Event event;
 
     public BulkOperationWrapper(final BulkOperation bulkOperation) {
-        this(bulkOperation, null, null, null);
+        this(bulkOperation, null, null, null, null);
     }
 
-    public BulkOperationWrapper(final BulkOperation bulkOperation, final EventHandle eventHandle, final SerializedJson jsonNode, final Event event) {
+    public BulkOperationWrapper(final BulkOperation bulkOperation, final EventHandle eventHandle, final SerializedJson jsonNode, final Event event,
+                                final Consumer<BulkResponseItem> bulkResponseItemConsumer) {
         checkNotNull(bulkOperation);
         this.bulkOperation = bulkOperation;
         this.eventHandle = eventHandle;
         this.jsonNode = jsonNode;
         this.event = event;
+        this.bulkResponseItemConsumer = bulkResponseItemConsumer;
+    }
+
+    public BulkOperationWrapper(final BulkOperation bulkOperation, final EventHandle eventHandle, final SerializedJson jsonNode, final Event event) {
+        this(bulkOperation, eventHandle, jsonNode, event, null);
     }
 
     public BulkOperationWrapper(final BulkOperation bulkOperation, final EventHandle eventHandle) {
-        this(bulkOperation, eventHandle, null, null);
+        this(bulkOperation, eventHandle, null, null, null);
     }
 
     public BulkOperation getBulkOperation() {
@@ -93,6 +102,10 @@ public class BulkOperationWrapper {
 
     public String getId() {
         return getValueFromConverter(BULK_OPERATION_TO_ID_CONVERTERS);
+    }
+
+    public Consumer<BulkResponseItem> getBulkResponseItemConsumer() {
+        return bulkResponseItemConsumer;
     }
 
     private <T> T getValueFromConverter(final Map<Predicate<BulkOperation>, Function<BulkOperation, T>> converters) {
