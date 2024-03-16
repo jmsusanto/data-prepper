@@ -424,13 +424,18 @@ public class OpenSearchSink extends AbstractSink<Record<Event>> {
     for (final Record<Event> record : findings) {
       final Event event = record.getData();
       final String ruleEngineId = event.get("RULE_ENGINE_DOC_MATCH_ID", String.class);
-      final String docId = ruleEngineIdToDocId.get(ruleEngineId).get(0);
-      final String docIndexName = ruleEngineIdToDocId.get(ruleEngineId).get(1);
       final List<String> replacementFields = event.getList("RULE_ENGINE_DOC_ID_REPLACEMENT_FIELDS", String.class);
       final String indexName = event.get("FINDINGS_INDEX_NAME", String.class);
 
-      event.put("index", docIndexName);
-      replacementFields.forEach(field -> event.put(field, docId == null ? Collections.emptyList() : List.of(docId)));
+      final List<String> docInfo = ruleEngineIdToDocId.get(ruleEngineId);
+      if (docInfo != null) {
+        final String docId = docInfo.get(0);
+        final String docIndexName = docInfo.get(1);
+        event.put("index", docIndexName);
+        replacementFields.forEach(field -> event.put(field, List.of(docId)));
+      } else {
+        replacementFields.forEach(field -> event.put(field, Collections.emptyList());
+      }
 
       event.delete("RULE_ENGINE_DOC_MATCH_ID");
       event.delete("RULE_ENGINE_DOC_ID_REPLACEMENT_FIELDS");
