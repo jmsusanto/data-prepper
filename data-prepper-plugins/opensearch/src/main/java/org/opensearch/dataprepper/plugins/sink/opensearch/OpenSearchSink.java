@@ -434,7 +434,7 @@ public class OpenSearchSink extends AbstractSink<Record<Event>> {
         event.put("index", docIndexName);
         replacementFields.forEach(field -> event.put(field, List.of(docId)));
       } else {
-        replacementFields.forEach(field -> event.put(field, Collections.emptyList());
+        replacementFields.forEach(field -> event.put(field, Collections.emptyList()));
       }
 
       event.delete("RULE_ENGINE_DOC_MATCH_ID");
