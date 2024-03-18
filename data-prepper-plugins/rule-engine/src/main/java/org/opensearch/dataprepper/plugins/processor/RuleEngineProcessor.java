@@ -17,7 +17,6 @@ import org.opensearch.dataprepper.model.processor.AbstractProcessor;
 import org.opensearch.dataprepper.model.processor.Processor;
 import org.opensearch.dataprepper.model.record.Record;
 import org.opensearch.dataprepper.plugins.processor.converters.FindingConverter;
-import org.opensearch.dataprepper.plugins.processor.converters.OCSFConverter;
 import org.opensearch.dataprepper.plugins.processor.evaluator.RuleEvaluator;
 import org.opensearch.dataprepper.plugins.processor.model.datatypes.DataType;
 import org.opensearch.dataprepper.plugins.processor.model.matches.Match;
@@ -46,7 +45,6 @@ public class RuleEngineProcessor extends AbstractProcessor<Record<Event>, Record
 
     private final RuleEvaluator ruleEvaluator;
     private final RuleEngineProcessorConfig config;
-    private final OCSFConverter ocsfConverter;
     private final FindingConverter findingConverter;
     private final IndexManager indexManager;
     private final ExpressionEvaluator expressionEvaluator;
@@ -84,7 +82,6 @@ public class RuleEngineProcessor extends AbstractProcessor<Record<Event>, Record
         final RuleEngineConfig ruleEngineConfig = new RuleEngineConfig(config.getRuleRefreshInterval(), config.getLogFormat(), config.getLogType(),
                 config.getRuleSchema(), config.getRuleLocation());
         ruleEvaluator = ruleEngine.start(ruleEngineConfig);
-        ocsfConverter = new OCSFConverter();
         findingConverter = new FindingConverter();
         acknowledgementSet = null;
     }
@@ -99,7 +96,7 @@ public class RuleEngineProcessor extends AbstractProcessor<Record<Event>, Record
             acknowledgementSet = ((DefaultEventHandle) (records.iterator().next().getData().getEventHandle())).getAcknowledgementSet();
         }
 
-        final Map<String, DataType> idToData = convertToOCSF(records);
+        final Map<String, DataType> idToData = addTrackingData(records);
         final Collection<Match> dataWithMatches = ruleEvaluator.evaluate(idToData.values());
         final Collection<Record<Event>> matches = convertMatchesToEvents(dataWithMatches);
 
@@ -111,14 +108,14 @@ public class RuleEngineProcessor extends AbstractProcessor<Record<Event>, Record
         return records;
     }
 
-    private Map<String, DataType> convertToOCSF(final Collection<Record<Event>> records) {
+    private Map<String, DataType> addTrackingData(final Collection<Record<Event>> records) {
         return records.stream()
                 .map(record -> {
                     final String id = UUID.randomUUID().toString();
-                    final DataType ocsf = ocsfConverter.convert(id, record);
-                    ocsf.putMetadataValue(OpenSearchDocMetadata.INDEX.getFieldName(), getIndexName(record));
+                    final DataType dataType = (DataType) record.getData();
+                    dataType.putMetadataValue(OpenSearchDocMetadata.INDEX.getFieldName(), getIndexName(record));
 
-                    final Map.Entry<String, DataType> mapEntry = Map.entry(id, ocsf);
+                    final Map.Entry<String, DataType> mapEntry = Map.entry(id, dataType);
                     record.getData().put(OpenSearchDocMetadata.RULE_ENGINE_ID.getFieldName(), id);
 
                     return mapEntry;

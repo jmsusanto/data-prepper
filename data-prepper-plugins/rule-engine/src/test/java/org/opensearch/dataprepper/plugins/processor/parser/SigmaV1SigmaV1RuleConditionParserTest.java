@@ -5,7 +5,7 @@
 //import org.mockito.MockitoAnnotations;
 //import org.opensearch.dataprepper.plugins.processor.model.datatypes.CloudTrail;
 //import org.opensearch.dataprepper.plugins.processor.model.datatypes.DataType;
-//import org.opensearch.dataprepper.plugins.processor.model.datatypes.OCSF;
+//import org.opensearch.dataprepper.plugins.processor.model.datatypes.ocsf.OCSF;
 //import org.opensearch.dataprepper.plugins.processor.parser.objects.SigmaRule;
 //
 //import java.nio.charset.StandardCharsets;

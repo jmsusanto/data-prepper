@@ -43,11 +43,11 @@ public class FindingConverter {
         eventMap.put("id", UUID.randomUUID().toString());
         eventMap.put("monitor_id", openSearchSigmaV1Rule.getMonitorId());
         eventMap.put("monitor_name", openSearchSigmaV1Rule.getDetectorName());
-        eventMap.put("index", match.getDataType().getMetadata().get(OpenSearchDocMetadata.INDEX.getFieldName()));
+        eventMap.put("index", match.getDataType().getMetadataValue(OpenSearchDocMetadata.INDEX.getFieldName()));
         eventMap.put("queries", rules.stream().map(this::getQuery).collect(Collectors.toList()));
         eventMap.put("timestamp", Instant.now().toEpochMilli());
         eventMap.put(OpenSearchDocMetadata.RULE_ENGINE_DOC_ID_REPLACEMENT_FIELDS.getFieldName(), List.of("related_doc_ids", "correlated_doc_ids"));
-        eventMap.put(OpenSearchDocMetadata.RULE_ENGINE_DOC_MATCH_ID.getFieldName(), match.getDataType().getMetadata().get(OpenSearchDocMetadata.RULE_ENGINE_ID.getFieldName()));
+        eventMap.put(OpenSearchDocMetadata.RULE_ENGINE_DOC_MATCH_ID.getFieldName(), match.getDataType().getMetadataValue(OpenSearchDocMetadata.RULE_ENGINE_ID.getFieldName()));
         eventMap.put(OpenSearchDocMetadata.FINDINGS_INDEX_NAME.getFieldName(), openSearchSigmaV1Rule.getFindingsIndex());
 
         return eventMap;
