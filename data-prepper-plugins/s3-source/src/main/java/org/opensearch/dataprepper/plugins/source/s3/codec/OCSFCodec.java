@@ -3,6 +3,7 @@ package org.opensearch.dataprepper.plugins.source.s3.codec;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 import org.opensearch.dataprepper.model.annotations.DataPrepperPlugin;
 import org.opensearch.dataprepper.model.annotations.DataPrepperPluginConstructor;
 import org.opensearch.dataprepper.model.codec.InputCodec;
@@ -16,7 +17,8 @@ import java.util.function.Consumer;
 
 @DataPrepperPlugin(name = "ocsf", pluginType = InputCodec.class, pluginConfigurationType = OCSFCodecConfig.class)
 public class OCSFCodec implements InputCodec {
-    private static final ObjectReader OBJECT_READER = new ObjectMapper().readerFor(OCSF.class);
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new AfterburnerModule());
+    private static final ObjectReader OBJECT_READER = OBJECT_MAPPER.readerFor(OCSF.class);
 
     @DataPrepperPluginConstructor
     public OCSFCodec(final OCSFCodecConfig config) {
