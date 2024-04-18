@@ -402,6 +402,7 @@ public class OpenSearchSink extends AbstractSink<Record<Event>> {
       try {
         bulkOperationWrapper = createBulkOperationWrapper(event, bulkResponseItemConsumer, indexName, null);
       } catch (final Exception e) {
+        LOG.error("Caught exception creating bulk wrapper", e);
         continue;
       }
 
@@ -421,11 +422,15 @@ public class OpenSearchSink extends AbstractSink<Record<Event>> {
     }
 
     // Here down is findings shipping
+    if (findings.size() > 0) {
+      LOG.info("Shipping {} findings", findings.size());
+    }
     for (final Record<Event> record : findings) {
       final Event event = record.getData();
       final String ruleEngineId = event.get("RULE_ENGINE_DOC_MATCH_ID", String.class);
       final List<String> replacementFields = event.getList("RULE_ENGINE_DOC_ID_REPLACEMENT_FIELDS", String.class);
       final String indexName = event.get("FINDINGS_INDEX_NAME", String.class);
+      LOG.info("Findings index: {}", indexName);
 
       final List<String> docInfo = ruleEngineIdToDocId.get(ruleEngineId);
       if (docInfo != null) {
@@ -445,6 +450,7 @@ public class OpenSearchSink extends AbstractSink<Record<Event>> {
       try {
         bulkOperationWrapper = createBulkOperationWrapper(event, null, indexName, event.get("id", String.class));
       } catch (final Exception e) {
+        LOG.error("Caught exception creating bulk wrapper", e);
         continue;
       }
 

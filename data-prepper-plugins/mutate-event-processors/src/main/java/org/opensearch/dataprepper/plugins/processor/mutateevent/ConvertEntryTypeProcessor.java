@@ -70,7 +70,7 @@ public class ConvertEntryTypeProcessor  extends AbstractProcessor<Record<Event>,
                                 recordEvent.put(key, converter.convert(keyVal));
                             } catch (final RuntimeException e) {
                                 LOG.error(EVENT, "Unable to convert key: {} with value: {} to {}", key, keyVal, type, e);
-                                recordEvent.getMetadata().addTags(tagsOnFailure);
+                                recordEvent.getEventMetadata().addTags(tagsOnFailure);
                             }
                         } else {
                             recordEvent.delete(key);
@@ -79,7 +79,7 @@ public class ConvertEntryTypeProcessor  extends AbstractProcessor<Record<Event>,
                 }
             } catch (final Exception e) {
                 LOG.error(EVENT, "There was an exception while processing Event [{}]", recordEvent, e);
-                recordEvent.getMetadata().addTags(tagsOnFailure);
+                recordEvent.getEventMetadata().addTags(tagsOnFailure);
             }
         }
         return records;

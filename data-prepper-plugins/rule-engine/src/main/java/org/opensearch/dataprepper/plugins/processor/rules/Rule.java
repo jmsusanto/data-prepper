@@ -1,29 +1,24 @@
 package org.opensearch.dataprepper.plugins.processor.rules;
 
-import org.opensearch.dataprepper.plugins.processor.model.datatypes.DataType;
+import lombok.experimental.SuperBuilder;
 
 import java.util.function.Predicate;
 
-public abstract class Rule {
-    private final Predicate<DataType> ruleCondition;
-    private final Predicate<DataType> evaluationCondition;
+@SuperBuilder
+public abstract class Rule<T, U> {
+    private final String id;
+    private final Predicate<T> evaluationCondition;
+    private final Predicate<U> ruleCondition;
 
-    public Rule(final Predicate<DataType> ruleCondition, final Predicate<DataType> evaluationCondition) {
-        this.ruleCondition = ruleCondition;
-        this.evaluationCondition = evaluationCondition;
+    public boolean testEvaluationCondition(final T input) {
+        return evaluationCondition.test(input);
     }
 
-    // Helper for always evaluate rules
-    public Rule(final Predicate<DataType> ruleCondition) {
-        this.ruleCondition = ruleCondition;
-        this.evaluationCondition = i -> true;
+    public boolean testRuleCondition(final U input) {
+        return ruleCondition.test(input);
     }
 
-    public Predicate<DataType> getRuleCondition() {
-        return ruleCondition;
-    }
-
-    public Predicate<DataType> getEvaluationCondition() {
-        return evaluationCondition;
+    public String getId() {
+        return id;
     }
 }

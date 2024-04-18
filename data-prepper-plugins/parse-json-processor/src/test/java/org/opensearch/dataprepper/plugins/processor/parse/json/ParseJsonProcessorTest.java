@@ -341,7 +341,7 @@ public class ParseJsonProcessorTest {
         parseJsonProcessor = createObjectUnderTest();
 
         final Event parsedEvent = createAndParseMessageEvent(testEvent);
-        assertTrue(parsedEvent.getMetadata().hasTags(testTags));
+        assertTrue(parsedEvent.getEventMetadata().hasTags(testTags));
     }
 
     @Test

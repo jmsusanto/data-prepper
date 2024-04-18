@@ -51,11 +51,11 @@ class JacksonEvent_JavaSerializationTest {
         final JacksonEvent deserializedEvent = (JacksonEvent) deserializedObject;
 
         assertThat(deserializedEvent.toMap(), equalTo(objectUnderTest.toMap()));
-        assertThat(deserializedEvent.getMetadata(), equalTo(objectUnderTest.getMetadata()));
+        assertThat(deserializedEvent.getEventMetadata(), equalTo(objectUnderTest.getEventMetadata()));
 
         assertThat(deserializedEvent.getEventHandle(), instanceOf(InternalEventHandle.class));
         assertThat(((InternalEventHandle) deserializedEvent.getEventHandle()).getAcknowledgementSet(), nullValue());
-        assertThat(deserializedEvent.getEventHandle().getInternalOriginationTime(), equalTo(objectUnderTest.getMetadata().getTimeReceived()));
+        assertThat(deserializedEvent.getEventHandle().getInternalOriginationTime(), equalTo(objectUnderTest.getEventMetadata().getTimeReceived()));
 
     }
 
@@ -71,11 +71,11 @@ class JacksonEvent_JavaSerializationTest {
         final JacksonEvent deserializedEvent = (JacksonEvent) deserializedObject;
 
         assertThat(deserializedEvent.toMap(), equalTo(objectUnderTest.toMap()));
-        assertThat(deserializedEvent.getMetadata(), equalTo(objectUnderTest.getMetadata()));
+        assertThat(deserializedEvent.getEventMetadata(), equalTo(objectUnderTest.getEventMetadata()));
 
         assertThat(deserializedEvent.getEventHandle(), instanceOf(InternalEventHandle.class));
         assertThat(((InternalEventHandle) deserializedEvent.getEventHandle()).getAcknowledgementSet(), nullValue());
-        assertThat(deserializedEvent.getEventHandle().getInternalOriginationTime(), equalTo(objectUnderTest.getMetadata().getTimeReceived()));
+        assertThat(deserializedEvent.getEventHandle().getInternalOriginationTime(), equalTo(objectUnderTest.getEventMetadata().getTimeReceived()));
     }
 
     private Object serializeAndDeserialize(final JacksonEvent objectUnderTest) throws IOException, ClassNotFoundException {

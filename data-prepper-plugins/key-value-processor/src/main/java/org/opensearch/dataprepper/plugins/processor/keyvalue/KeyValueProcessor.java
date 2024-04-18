@@ -251,14 +251,14 @@ public class KeyValueProcessor extends AbstractProcessor<Record<Event>, Record<E
                         outputMap.putAll(createRecursedMap(recursedTree, mapper));
                     } catch (Exception e) {
                         LOG.error("Recursive parsing ran into an unexpected error, treating message as non-recursive", e);
-                        recordEvent.getMetadata().addTags(tagsOnFailure);
+                        recordEvent.getEventMetadata().addTags(tagsOnFailure);
                     }
                 } else {
                     try {
                         outputMap.putAll(createNonRecursedMap(groups));
                     } catch (Exception e) {
                         LOG.error("Non-recursive parsing ran into an unexpected error", e);
-                        recordEvent.getMetadata().addTags(tagsOnFailure);
+                        recordEvent.getEventMetadata().addTags(tagsOnFailure);
                     }
                 }
 
@@ -274,7 +274,7 @@ public class KeyValueProcessor extends AbstractProcessor<Record<Event>, Record<E
                 }
             } catch (final Exception e) {
                 LOG.error(EVENT, "There was an exception while processing on Event [{}]: ", recordEvent, e);
-                recordEvent.getMetadata().addTags(tagsOnFailure);
+                recordEvent.getEventMetadata().addTags(tagsOnFailure);
             }
         }
 

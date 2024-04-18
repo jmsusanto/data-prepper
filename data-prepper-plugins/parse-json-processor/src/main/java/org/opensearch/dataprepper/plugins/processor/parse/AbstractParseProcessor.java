@@ -78,7 +78,7 @@ public abstract class AbstractParseProcessor extends AbstractProcessor<Record<Ev
 
                 final Optional<HashMap<String, Object>> parsedValueOptional = readValue(message, event);
                 if (parsedValueOptional.isEmpty()) {
-                    event.getMetadata().addTags(tagsOnFailure);
+                    event.getEventMetadata().addTags(tagsOnFailure);
                     continue;
                 }
 

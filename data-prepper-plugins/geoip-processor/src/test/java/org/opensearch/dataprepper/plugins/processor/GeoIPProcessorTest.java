@@ -330,7 +330,7 @@ class GeoIPProcessorTest {
 
         for (final Record<Event> record : records) {
             Event event = record.getData();
-            assertTrue(event.getMetadata().hasTags(testTags));
+            assertTrue(event.getEventMetadata().hasTags(testTags));
             verify(geoIpEventsFailedLookup).increment();
             verify(geoIpEventsProcessed).increment();
         }

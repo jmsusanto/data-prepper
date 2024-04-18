@@ -40,7 +40,7 @@ public class DocumentBuilderTest {
             .withData(data)
             .withEventType("TestEvent")
             .build();
-        event.getMetadata().addTags(List.of("tag1"));
+        event.getEventMetadata().addTags(List.of("tag1"));
         expectedOutput = objectMapper.writeValueAsString(data);
         expectedOutputWithTags = event.jsonBuilder().includeTags(tagsKey).toJsonString();
     }

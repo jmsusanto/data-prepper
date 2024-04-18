@@ -24,7 +24,7 @@ public class JacksonDocumentTest {
         final Document document = JacksonDocument.builder().build();
 
         assertThat(document, is(notNullValue()));
-        assertThat(document.getMetadata().getEventType(), is(equalTo("DOCUMENT")));
+        assertThat(document.getEventMetadata().getEventType(), is(equalTo("DOCUMENT")));
     }
 
     @Test
@@ -35,7 +35,7 @@ public class JacksonDocumentTest {
                         .build();
 
         assertThat(document, is(notNullValue()));
-        assertThat(document.getMetadata().getEventType(), is(equalTo("DOCUMENT")));
+        assertThat(document.getEventMetadata().getEventType(), is(equalTo("DOCUMENT")));
     }
 
     @Test

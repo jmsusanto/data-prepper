@@ -6,6 +6,8 @@ package org.opensearch.dataprepper.plugins.processor.parser.objects;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.opensearch.dataprepper.plugins.processor.parser.aggregation.AggregationItem;
+import org.opensearch.dataprepper.plugins.processor.parser.aggregation.AggregationTraverseVisitor;
 import org.opensearch.dataprepper.plugins.processor.parser.condition.ConditionFieldEqualsValueExpression;
 import org.opensearch.dataprepper.plugins.processor.parser.condition.ConditionIdentifier;
 import org.opensearch.dataprepper.plugins.processor.parser.condition.ConditionItem;
@@ -14,6 +16,8 @@ import org.opensearch.dataprepper.plugins.processor.parser.condition.ConditionTr
 import org.opensearch.dataprepper.plugins.processor.parser.condition.ConditionValueExpression;
 import org.opensearch.dataprepper.plugins.processor.parser.exceptions.SigmaConditionError;
 import org.opensearch.dataprepper.plugins.processor.parser.utils.Either;
+import org.opensearch.dataprepper.plugins.processor.rules.antlr.AggregationLexer;
+import org.opensearch.dataprepper.plugins.processor.rules.antlr.AggregationParser;
 import org.opensearch.dataprepper.plugins.processor.rules.antlr.ConditionLexer;
 import org.opensearch.dataprepper.plugins.processor.rules.antlr.ConditionParser;
 
@@ -41,8 +45,10 @@ public class SigmaCondition {
     private SigmaDetections detections;
 
     private ConditionParser parser;
-
     private ConditionTraverseVisitor conditionVisitor;
+
+    private AggregationParser aggParser;
+    private AggregationTraverseVisitor aggregationVisitor;
 
     public SigmaCondition(String condition, SigmaDetections detections) {
         if (condition.contains(" | ")) {
@@ -58,9 +64,13 @@ public class SigmaCondition {
         ConditionLexer lexer = new ConditionLexer(CharStreams.fromString(this.condition));
         this.parser = new ConditionParser(new CommonTokenStream(lexer));
         this.conditionVisitor = new ConditionTraverseVisitor(this);
+
+        AggregationLexer aggLexer = new AggregationLexer(CharStreams.fromString(this.aggregation));
+        this.aggParser = new AggregationParser(new CommonTokenStream(aggLexer));
+        this.aggregationVisitor = new AggregationTraverseVisitor();
     }
 
-    public ConditionItem parsed() throws SigmaConditionError {
+    public ConditionItem parseConditionItem() throws SigmaConditionError {
         ConditionItem parsedConditionItem;
         Either<ConditionItem, String> itemOrCondition = conditionVisitor.visit(parser.start());
         if (itemOrCondition.isLeft()) {
@@ -70,6 +80,15 @@ public class SigmaCondition {
         }
 
         return parsedConditionItem;
+    }
+
+    public AggregationItem parseAggregationItem() {
+        if (aggregation == null) {
+            return null;
+        }
+
+        aggregationVisitor.visit(aggParser.comparison_expr());
+        return aggregationVisitor.getAggregationItem();
     }
 
     public List<Either<ConditionItem, String>> convertArgs(List<Either<ConditionItem, String>> parsedArgs) throws SigmaConditionError {

@@ -197,7 +197,7 @@ public class KafkaSourceJsonTypeIT {
         for (int i = 0; i < numRecords; i++) {
             Record<Event> record = receivedRecords.get(i);
             Event event = (Event) record.getData();
-            EventMetadata metadata = event.getMetadata();
+            EventMetadata metadata = event.getEventMetadata();
             Map<String, Object> map = event.toMap();
             assertThat(map.get("name"), equalTo("testName" + i));
             assertThat(map.get("id"), equalTo(TEST_ID + i));
@@ -229,7 +229,7 @@ public class KafkaSourceJsonTypeIT {
         for (int i = 0; i < numRecords; i++) {
             Record<Event> record = receivedRecords.get(i);
             Event event = (Event) record.getData();
-            EventMetadata metadata = event.getMetadata();
+            EventMetadata metadata = event.getEventMetadata();
             Map<String, Object> map = event.toMap();
             assertThat(map.get("name"), equalTo("testName" + i));
             assertThat(map.get("id"), equalTo(TEST_ID + i));
@@ -247,7 +247,7 @@ public class KafkaSourceJsonTypeIT {
         for (int i = 0; i < numRecords; i++) {
             Record<Event> record = receivedRecords.get(i);
             Event event = (Event) record.getData();
-            EventMetadata metadata = event.getMetadata();
+            EventMetadata metadata = event.getEventMetadata();
             Map<String, Object> map = event.toMap();
             assertThat(map.get("name"), equalTo("testName" + i));
             assertThat(map.get("id"), equalTo(TEST_ID + i));
@@ -278,7 +278,7 @@ public class KafkaSourceJsonTypeIT {
         for (int i = 0; i < numRecords; i++) {
             Record<Event> record = receivedRecords.get(i);
             Event event = (Event) record.getData();
-            EventMetadata metadata = event.getMetadata();
+            EventMetadata metadata = event.getEventMetadata();
             Map<String, Object> map = event.toMap();
             assertThat(map.get("name"), equalTo("testName" + i));
             assertThat(map.get("id"), equalTo(TEST_ID + i));
@@ -308,7 +308,7 @@ public class KafkaSourceJsonTypeIT {
         for (int i = 0; i < numRecords; i++) {
             Record<Event> record = receivedRecords.get(i);
             Event event = (Event) record.getData();
-            EventMetadata metadata = event.getMetadata();
+            EventMetadata metadata = event.getEventMetadata();
             Map<String, Object> map = event.toMap();
             assertThat(map.get("name"), equalTo("testName" + i));
             assertThat(map.get("id"), equalTo(TEST_ID + i));
@@ -339,7 +339,7 @@ public class KafkaSourceJsonTypeIT {
         for (int i = 0; i < numRecords; i++) {
             Record<Event> record = receivedRecords.get(i);
             Event event = (Event) record.getData();
-            EventMetadata metadata = event.getMetadata();
+            EventMetadata metadata = event.getEventMetadata();
             Map<String, Object> map = event.toMap();
             assertThat(map.get("name"), equalTo("testName" + i));
             assertThat(map.get("id"), equalTo(TEST_ID + i));

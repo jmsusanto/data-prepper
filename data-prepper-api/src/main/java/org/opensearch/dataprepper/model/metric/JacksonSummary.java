@@ -34,7 +34,7 @@ public class JacksonSummary extends JacksonMetric implements Summary {
     protected JacksonSummary(JacksonSummary.Builder builder, boolean flattenAttributes) {
         super(builder, flattenAttributes);
 
-        checkArgument(this.getMetadata().getEventType().equals(EventType.METRIC.toString()), "eventType must be of type Metric");
+        checkArgument(this.getEventMetadata().getEventType().equals(EventType.METRIC.toString()), "eventType must be of type Metric");
     }
 
     public static JacksonSummary.Builder builder() {

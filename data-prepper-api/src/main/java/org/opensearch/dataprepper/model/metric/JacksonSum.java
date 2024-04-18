@@ -32,7 +32,7 @@ public class JacksonSum extends JacksonMetric implements Sum {
     protected JacksonSum(JacksonSum.Builder builder, boolean flattenAttributes) {
         super(builder, flattenAttributes);
 
-        checkArgument(this.getMetadata().getEventType().equals(EventType.METRIC.toString()), "eventType must be of type Metric");
+        checkArgument(this.getEventMetadata().getEventType().equals(EventType.METRIC.toString()), "eventType must be of type Metric");
     }
 
     public static JacksonSum.Builder builder() {

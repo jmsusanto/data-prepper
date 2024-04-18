@@ -47,7 +47,7 @@ class DefaultEventBuilderFactoryTests {
         EventBuilder eventBuilder = (EventBuilder)baseEventBuilder.withEventMetadataAttributes(attributes).withData(data);
 
         JacksonEvent event = (JacksonEvent) eventBuilder.build();
-        EventMetadata eventMetadata = event.getMetadata();
+        EventMetadata eventMetadata = event.getEventMetadata();
         assertThat(eventMetadata.getTimeReceived(), not(equalTo(null)));
         assertThat(eventMetadata.getEventType(), equalTo(DefaultEventBuilderFactory.EVENT_TYPE));
         assertThat(eventMetadata.getAttributes(), equalTo(attributes));

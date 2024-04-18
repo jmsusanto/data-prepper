@@ -35,7 +35,7 @@ public class GetMetadataExpressionFunction implements ExpressionFunction {
         if (argStr.isEmpty()) {
             return null;
         }
-        Object value = event.getMetadata().getAttribute(argStr);
+        Object value = event.getEventMetadata().getAttribute(argStr);
         if (value == null) {
             return null;
         }

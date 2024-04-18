@@ -30,7 +30,7 @@ public class HasTagsExpressionFunction implements ExpressionFunction {
                                         return str.substring(1, str.length()-1);
                                      })
                                     .collect(Collectors.toList());
-        return event.getMetadata().hasTags(tags);
+        return event.getEventMetadata().hasTags(tags);
     }
 }
 

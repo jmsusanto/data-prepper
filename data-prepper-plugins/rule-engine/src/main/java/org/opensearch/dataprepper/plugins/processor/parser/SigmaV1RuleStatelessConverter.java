@@ -8,8 +8,6 @@ import org.opensearch.dataprepper.plugins.processor.parser.condition.ConditionIt
 import org.opensearch.dataprepper.plugins.processor.parser.condition.ConditionNOT;
 import org.opensearch.dataprepper.plugins.processor.parser.condition.ConditionOR;
 import org.opensearch.dataprepper.plugins.processor.parser.condition.ConditionValueExpression;
-import org.opensearch.dataprepper.plugins.processor.parser.objects.SigmaCondition;
-import org.opensearch.dataprepper.plugins.processor.parser.objects.SigmaRule;
 import org.opensearch.dataprepper.plugins.processor.parser.types.SigmaBool;
 import org.opensearch.dataprepper.plugins.processor.parser.types.SigmaFloat;
 import org.opensearch.dataprepper.plugins.processor.parser.types.SigmaInteger;
@@ -20,22 +18,21 @@ import org.opensearch.dataprepper.plugins.processor.parser.utils.Either;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class SigmaV1RuleConditionParser {
-    private static final Logger LOG = LoggerFactory.getLogger(SigmaV1RuleConditionParser.class);
+public class SigmaV1RuleStatelessConverter {
+    private static final Logger LOG = LoggerFactory.getLogger(SigmaV1RuleStatelessConverter.class);
 
     private final FieldAccessor fieldAccessor;
 
-    public SigmaV1RuleConditionParser(final Map<String, String> mapping) {
-        this.fieldAccessor = new FieldAccessor(mapping);
+    public SigmaV1RuleStatelessConverter(final FieldAccessor fieldAccessor) {
+        this.fieldAccessor = fieldAccessor;
     }
 
-    public Predicate<DataType> parseRuleCondition(final SigmaRule sigmaRule) {
-        return sigmaRule.getDetection().getParsedConditions().stream()
-                .map(SigmaCondition::parsed)
+    public Predicate<DataType> parseRuleCondition(final List<ConditionItem> conditionItems) {
+        return conditionItems.stream()
                 .map(this::parsePredicateFromConditionItem)
                 // TODO - Not sure on this, need to figure out how there could be multiple conditions for same rule
                 .reduce(Predicate::and)
@@ -109,8 +106,8 @@ public class SigmaV1RuleConditionParser {
 
     private Predicate<DataType> convertStringEquals(final ConditionFieldEqualsValueExpression condition) {
         final SigmaString sigmaString = (SigmaString) condition.getValue();
-        return event -> {
-            final String value = fieldAccessor.getStringValue(event, condition.getField());
+        return dataType -> {
+            final String value = fieldAccessor.getStringValue(dataType, condition.getField());
 
             return sigmaString.getOriginal().equals(value);
         };
@@ -118,20 +115,20 @@ public class SigmaV1RuleConditionParser {
 
     private Predicate<DataType> convertBooleanEquals(final ConditionFieldEqualsValueExpression condition) {
         final SigmaBool sigmaBool = (SigmaBool) condition.getValue();
-        return event -> sigmaBool.getBoolean().equals(fieldAccessor.getBooleanValue(event, condition.getField()));
+        return dataType -> sigmaBool.getBoolean().equals(fieldAccessor.getBooleanValue(dataType, condition.getField()));
     }
 
     private Predicate<DataType> convertIntegerEquals(final ConditionFieldEqualsValueExpression condition) {
         final SigmaInteger sigmaInteger = (SigmaInteger) condition.getValue();
-        return event -> sigmaInteger.getInteger().equals(fieldAccessor.getIntegerValue(event, condition.getField()));
+        return dataType -> sigmaInteger.getInteger().equals(fieldAccessor.getIntegerValue(dataType, condition.getField()));
     }
 
     private Predicate<DataType> convertFloatEquals(final ConditionFieldEqualsValueExpression condition) {
         final SigmaFloat sigmaFloat = (SigmaFloat) condition.getValue();
-        return event -> sigmaFloat.getFloat().equals(fieldAccessor.getFloatValue(event, condition.getField()));
+        return dataType -> sigmaFloat.getFloat().equals(fieldAccessor.getFloatValue(dataType, condition.getField()));
     }
 
     private Predicate<DataType> convertNullEquals(final ConditionFieldEqualsValueExpression condition) {
-        return event -> fieldAccessor.getObjectValue(event, condition.getField()) == null;
+        return dataType -> fieldAccessor.getObjectValue(dataType, condition.getField()) == null;
     }
 }

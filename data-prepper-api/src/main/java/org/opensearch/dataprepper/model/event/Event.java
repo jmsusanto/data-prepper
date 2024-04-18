@@ -96,7 +96,7 @@ public interface Event extends Serializable {
      * @return EventMetadata for the event
      * @since 1.2
      */
-    EventMetadata getMetadata();
+    EventMetadata getEventMetadata();
 
     /**
      * Checks if the key exists.

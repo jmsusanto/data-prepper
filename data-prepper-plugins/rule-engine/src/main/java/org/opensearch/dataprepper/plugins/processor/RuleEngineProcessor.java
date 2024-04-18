@@ -21,6 +21,7 @@ import org.opensearch.dataprepper.plugins.processor.evaluator.RuleEvaluator;
 import org.opensearch.dataprepper.plugins.processor.model.datatypes.DataType;
 import org.opensearch.dataprepper.plugins.processor.model.matches.Match;
 import org.opensearch.dataprepper.plugins.processor.provider.rules.opensearch.OpenSearchRuleProvider;
+import org.opensearch.dataprepper.plugins.processor.retrievers.OpenSearchSubMatchAccessor;
 import org.opensearch.dataprepper.plugins.processor.util.OpenSearchDocMetadata;
 import org.opensearch.dataprepper.plugins.sink.opensearch.OpenSearchSinkConfiguration;
 import org.opensearch.dataprepper.plugins.sink.opensearch.index.ClusterSettingsParser;
@@ -78,9 +79,16 @@ public class RuleEngineProcessor extends AbstractProcessor<Record<Event>, Record
 
         final RuleEngine ruleEngine = new RuleEngine();
         ruleEngine.registerRuleProvider("opensearch", () -> new OpenSearchRuleProvider(openSearchClient));
+        ruleEngine.registerSubMatchAccessor("opensearch", () -> new OpenSearchSubMatchAccessor(openSearchClient));
 
-        final RuleEngineConfig ruleEngineConfig = new RuleEngineConfig(config.getRuleRefreshInterval(), config.getLogFormat(), config.getLogType(),
-                config.getRuleSchema(), config.getRuleLocation());
+        final RuleEngineConfig ruleEngineConfig = RuleEngineConfig.builder()
+                .ruleRefreshInterval(config.getRuleRefreshInterval())
+                .logFormat(config.getLogFormat())
+                .logType(config.getLogType())
+                .ruleLocation(config.getRuleLocation())
+                .ruleSchema(config.getRuleSchema())
+                .subMatchAccessor(config.getSubMatchAccessor())
+                .build();
         ruleEvaluator = ruleEngine.start(ruleEngineConfig);
         findingConverter = new FindingConverter();
         acknowledgementSet = null;
@@ -98,7 +106,9 @@ public class RuleEngineProcessor extends AbstractProcessor<Record<Event>, Record
 
         final Map<String, DataType> idToData = addTrackingData(records);
         final Collection<Match> dataWithMatches = ruleEvaluator.evaluate(idToData.values());
+        LOG.info("Matches: {}", dataWithMatches.size());
         final Collection<Record<Event>> matches = convertMatchesToEvents(dataWithMatches);
+        LOG.info("Matches as events: {}", matches.size());
 
         if (config.isDropData()) {
             return matches;
@@ -113,7 +123,7 @@ public class RuleEngineProcessor extends AbstractProcessor<Record<Event>, Record
                 .map(record -> {
                     final String id = UUID.randomUUID().toString();
                     final DataType dataType = (DataType) record.getData();
-                    dataType.putMetadataValue(OpenSearchDocMetadata.INDEX.getFieldName(), getIndexName(record));
+                    dataType.putDataTypeMetadataValue(OpenSearchDocMetadata.INDEX.getFieldName(), getIndexName(record));
 
                     final Map.Entry<String, DataType> mapEntry = Map.entry(id, dataType);
                     record.getData().put(OpenSearchDocMetadata.RULE_ENGINE_ID.getFieldName(), id);

@@ -18,7 +18,7 @@ public class JacksonDocument extends JacksonEvent implements Document {
     protected JacksonDocument(final Builder builder) {
         super(builder);
 
-        checkArgument(this.getMetadata().getEventType().equals("DOCUMENT"), "eventType must be of type Document");
+        checkArgument(this.getEventMetadata().getEventType().equals("DOCUMENT"), "eventType must be of type Document");
     }
 
     public static Builder builder() {

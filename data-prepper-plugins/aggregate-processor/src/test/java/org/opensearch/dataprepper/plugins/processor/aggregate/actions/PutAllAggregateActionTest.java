@@ -99,7 +99,7 @@ public class PutAllAggregateActionTest {
         final AggregateActionOutput actionOutput = combineAggregateAction.concludeGroup(aggregateActionInput);
         final List<Event> result = actionOutput.getEvents();
         assertThat(result.size(), equalTo(1));
-        assertThat(result.get(0).getMetadata().getEventType(), equalTo(PutAllAggregateAction.EVENT_TYPE));
+        assertThat(result.get(0).getEventMetadata().getEventType(), equalTo(PutAllAggregateAction.EVENT_TYPE));
         assertThat(result.get(0).toMap(), equalTo(groupState));
     }
 }

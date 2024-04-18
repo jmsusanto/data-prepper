@@ -57,7 +57,7 @@ public class ListToMapProcessor extends AbstractProcessor<Record<Event>, Record<
                 } catch (final Exception e) {
                     LOG.warn(EVENT, "Given source path [{}] is not valid on record [{}]",
                             config.getSource(), recordEvent, e);
-                    recordEvent.getMetadata().addTags(config.getTagsOnFailure());
+                    recordEvent.getEventMetadata().addTags(config.getTagsOnFailure());
                     continue;
                 }
 
@@ -67,11 +67,11 @@ public class ListToMapProcessor extends AbstractProcessor<Record<Event>, Record<
                 } catch (final IllegalArgumentException e) {
                     LOG.warn(EVENT, "Cannot find a list at the given source path [{}} on record [{}]",
                             config.getSource(), recordEvent, e);
-                    recordEvent.getMetadata().addTags(config.getTagsOnFailure());
+                    recordEvent.getEventMetadata().addTags(config.getTagsOnFailure());
                     continue;
                 } catch (final Exception e) {
                     LOG.error(EVENT, "Error converting source list to map on record [{}]", recordEvent, e);
-                    recordEvent.getMetadata().addTags(config.getTagsOnFailure());
+                    recordEvent.getEventMetadata().addTags(config.getTagsOnFailure());
                     continue;
                 }
 
@@ -79,11 +79,11 @@ public class ListToMapProcessor extends AbstractProcessor<Record<Event>, Record<
                     updateEvent(recordEvent, targetMap);
                 } catch (final Exception e) {
                     LOG.error(EVENT, "Error updating record [{}] after converting source list to map", recordEvent, e);
-                    recordEvent.getMetadata().addTags(config.getTagsOnFailure());
+                    recordEvent.getEventMetadata().addTags(config.getTagsOnFailure());
                 }
             } catch (final Exception e) {
                 LOG.error(EVENT, "There was an exception while processing Event [{}]", recordEvent, e);
-                recordEvent.getMetadata().addTags(config.getTagsOnFailure());
+                recordEvent.getEventMetadata().addTags(config.getTagsOnFailure());
             }
         }
         return records;

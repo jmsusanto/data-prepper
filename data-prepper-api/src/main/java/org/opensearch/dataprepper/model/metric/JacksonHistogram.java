@@ -41,7 +41,7 @@ public class JacksonHistogram extends JacksonMetric implements Histogram {
     protected JacksonHistogram(JacksonHistogram.Builder builder, boolean flattenAttributes) {
         super(builder, flattenAttributes);
 
-        checkArgument(this.getMetadata().getEventType().equals(EventType.METRIC.toString()), "eventType must be of type Metric");
+        checkArgument(this.getEventMetadata().getEventType().equals(EventType.METRIC.toString()), "eventType must be of type Metric");
     }
     public static JacksonHistogram.Builder builder() {
         return new JacksonHistogram.Builder();

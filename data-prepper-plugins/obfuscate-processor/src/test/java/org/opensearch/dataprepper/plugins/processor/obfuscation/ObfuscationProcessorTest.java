@@ -118,9 +118,9 @@ class ObfuscationProcessorTest {
 
         assertThat(editedRecords.size(), equalTo(1));
         assertThat(editedRecords.get(0).getData().toMap(), equalTo(expectedEventMap));
-        assertThat(editedRecords.get(0).getData().getMetadata().getTags(), notNullValue());
-        assertThat(editedRecords.get(0).getData().getMetadata().getTags().size(), equalTo(1));
-        assertThat(editedRecords.get(0).getData().getMetadata().getTags().contains(mockConfig.getTagsOnMatchFailure().get(0)), equalTo(true));
+        assertThat(editedRecords.get(0).getData().getEventMetadata().getTags(), notNullValue());
+        assertThat(editedRecords.get(0).getData().getEventMetadata().getTags().size(), equalTo(1));
+        assertThat(editedRecords.get(0).getData().getEventMetadata().getTags().contains(mockConfig.getTagsOnMatchFailure().get(0)), equalTo(true));
     }
 
 

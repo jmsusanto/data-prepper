@@ -1,5 +1,8 @@
 package org.opensearch.dataprepper.plugins.processor;
 
+import org.opensearch.dataprepper.plugins.processor.evaluator.CompositeRuleEvaluator;
+import org.opensearch.dataprepper.plugins.processor.evaluator.CorrelationEvaluator;
+import org.opensearch.dataprepper.plugins.processor.evaluator.DefaultCorrelationEvaluator;
 import org.opensearch.dataprepper.plugins.processor.evaluator.DefaultRuleEvaluator;
 import org.opensearch.dataprepper.plugins.processor.evaluator.RuleEvaluator;
 import org.opensearch.dataprepper.plugins.processor.model.mappings.Mapping;
@@ -7,6 +10,8 @@ import org.opensearch.dataprepper.plugins.processor.parser.RuleParser;
 import org.opensearch.dataprepper.plugins.processor.provider.rules.RuleProvider;
 import org.opensearch.dataprepper.plugins.processor.registrar.MappingRegistrar;
 import org.opensearch.dataprepper.plugins.processor.registrar.RuleProviderRegistrar;
+import org.opensearch.dataprepper.plugins.processor.registrar.SubMatchAccessorRegistrar;
+import org.opensearch.dataprepper.plugins.processor.retrievers.SubMatchAccessor;
 import org.opensearch.dataprepper.plugins.processor.rules.RuleRefresher;
 import org.opensearch.dataprepper.plugins.processor.rules.RuleStore;
 import org.slf4j.Logger;
@@ -25,11 +30,14 @@ public class RuleEngine {
 
     private final MappingRegistrar mappingRegistrar;
     private final RuleProviderRegistrar ruleProviderRegistrar;
+    private final SubMatchAccessorRegistrar subMatchAccessorRegistrar;
     private RuleEvaluator ruleEvaluator;
+    private CorrelationEvaluator correlationEvaluator;
 
     public RuleEngine() {
         mappingRegistrar = new MappingRegistrar();
         ruleProviderRegistrar = new RuleProviderRegistrar();
+        subMatchAccessorRegistrar = new SubMatchAccessorRegistrar();
     }
 
     public void registerMapping(final String logType, final Supplier<Mapping> mappingSupplier) {
@@ -40,12 +48,23 @@ public class RuleEngine {
         ruleProviderRegistrar.registerRuleProvider(ruleLocation, ruleProviderSupplier);
     }
 
+    public void registerSubMatchAccessor(final String accessorName, final Supplier<SubMatchAccessor> subMatchAccessorSupplier) {
+        subMatchAccessorRegistrar.registerSubMatchAccessor(accessorName, subMatchAccessorSupplier);
+    }
+
     public RuleEvaluator start(final RuleEngineConfig config) {
         final RuleStore ruleStore = new RuleStore();
         setupRuleFetching(config, ruleStore);
 
         if (ruleEvaluator == null) {
             ruleEvaluator = new DefaultRuleEvaluator(ruleStore);
+        }
+        if (correlationEvaluator == null && config.getSubMatchAccessor() != null) {
+            correlationEvaluator = new DefaultCorrelationEvaluator(ruleStore, subMatchAccessorRegistrar.getSubMatchAccessor(config.getSubMatchAccessor()));
+            return CompositeRuleEvaluator.builder()
+                    .ruleEvaluator(ruleEvaluator)
+                    .correlationEvaluator(correlationEvaluator)
+                    .build();
         }
 
         return ruleEvaluator;

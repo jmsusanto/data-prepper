@@ -158,7 +158,7 @@ public class GeoIPProcessor extends AbstractProcessor<Record<Event>, Record<Even
 
       if (isEventFailedLookup) {
         geoIpEventsFailedLookup.increment();
-        event.getMetadata().addTags(tagsOnFailure);
+        event.getEventMetadata().addTags(tagsOnFailure);
       }
     }
     geoIPDatabaseReader.close();

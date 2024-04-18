@@ -88,7 +88,7 @@ processor:
 > creating index template for [Data Streams](https://opensearch.org/docs/latest/opensearch/data-streams/#step-1-create-an-index-template). 
 * `source_timezone` (Optional): Timezone used for parsing dates. It will be used in case of zone or offset cannot be extracted from value. 
   If zone or offset is part of the value timezone will be ignored. 
-  All the zone rules are provided to JVM by default provider defined by
+  All the zone statelessRules are provided to JVM by default provider defined by
   IANA Time Zone Database (TZDB). Find all the available timezones [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List) 
   in "TZ database name" column.
   * Type: String

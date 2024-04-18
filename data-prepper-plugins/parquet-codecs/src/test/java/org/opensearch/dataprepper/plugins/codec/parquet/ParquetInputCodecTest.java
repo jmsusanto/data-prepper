@@ -227,8 +227,8 @@ public class ParquetInputCodecTest {
             assertThat(metadata.get("key"), equalTo("value"));
             assertThat(lastUpdated, equalTo(1684509331977L));
 
-            assertThat(record.getData().getMetadata(), notNullValue());
-            assertThat(record.getData().getMetadata().getEventType(), equalTo("event"));
+            assertThat(record.getData().getEventMetadata(), notNullValue());
+            assertThat(record.getData().getEventMetadata().getEventType(), equalTo("event"));
         }
     }
 }

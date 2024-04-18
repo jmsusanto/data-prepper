@@ -43,9 +43,9 @@ public class JacksonPeerForwarderCodec implements PeerForwarderCodec {
         List<WireEvent> wireEventList = null;
         if (peerForwardingEvents.getEvents() != null) {
             wireEventList = peerForwardingEvents.getEvents().stream().map(event -> new WireEvent(
-                    event.getMetadata().getEventType(),
-                    event.getMetadata().getTimeReceived(),
-                    event.getMetadata().getAttributes(),
+                    event.getEventMetadata().getEventType(),
+                    event.getEventMetadata().getTimeReceived(),
+                    event.getEventMetadata().getAttributes(),
                     event.toJsonString()
             )).collect(Collectors.toList());
         }

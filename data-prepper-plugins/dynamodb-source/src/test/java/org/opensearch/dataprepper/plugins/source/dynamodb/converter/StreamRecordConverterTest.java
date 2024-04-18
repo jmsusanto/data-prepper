@@ -150,15 +150,15 @@ class StreamRecordConverterTest {
         assertThat(recordArgumentCaptor.getValue().getData(), notNullValue());
         JacksonEvent event = (JacksonEvent) recordArgumentCaptor.getValue().getData();
 
-        assertThat(event.getMetadata(), notNullValue());
+        assertThat(event.getEventMetadata(), notNullValue());
         String partitionKey = record.dynamodb().keys().get(partitionKeyAttrName).s();
         String sortKey = record.dynamodb().keys().get(sortKeyAttrName).s();
-        assertThat(event.getMetadata().getAttribute(PARTITION_KEY_METADATA_ATTRIBUTE), equalTo(partitionKey));
-        assertThat(event.getMetadata().getAttribute(SORT_KEY_METADATA_ATTRIBUTE), equalTo(sortKey));
-        assertThat(event.getMetadata().getAttribute(PRIMARY_KEY_DOCUMENT_ID_METADATA_ATTRIBUTE), equalTo(partitionKey + "|" + sortKey));
-        assertThat(event.getMetadata().getAttribute(EVENT_NAME_BULK_ACTION_METADATA_ATTRIBUTE), equalTo(OpenSearchBulkActions.INDEX.toString()));
-        assertThat(event.getMetadata().getAttribute(DDB_STREAM_EVENT_NAME_METADATA_ATTRIBUTE), equalTo("INSERT"));
-        assertThat(event.getMetadata().getAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE), equalTo(record.dynamodb().approximateCreationDateTime().toEpochMilli()));
+        assertThat(event.getEventMetadata().getAttribute(PARTITION_KEY_METADATA_ATTRIBUTE), equalTo(partitionKey));
+        assertThat(event.getEventMetadata().getAttribute(SORT_KEY_METADATA_ATTRIBUTE), equalTo(sortKey));
+        assertThat(event.getEventMetadata().getAttribute(PRIMARY_KEY_DOCUMENT_ID_METADATA_ATTRIBUTE), equalTo(partitionKey + "|" + sortKey));
+        assertThat(event.getEventMetadata().getAttribute(EVENT_NAME_BULK_ACTION_METADATA_ATTRIBUTE), equalTo(OpenSearchBulkActions.INDEX.toString()));
+        assertThat(event.getEventMetadata().getAttribute(DDB_STREAM_EVENT_NAME_METADATA_ATTRIBUTE), equalTo("INSERT"));
+        assertThat(event.getEventMetadata().getAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE), equalTo(record.dynamodb().approximateCreationDateTime().toEpochMilli()));
 
         assertThat(event.get(partitionKeyAttrName, String.class), notNullValue());
         assertThat(event.get(sortKeyAttrName, String.class), notNullValue());
@@ -196,15 +196,15 @@ class StreamRecordConverterTest {
         assertThat(recordArgumentCaptor.getValue().getData(), notNullValue());
         JacksonEvent event = (JacksonEvent) recordArgumentCaptor.getValue().getData();
 
-        assertThat(event.getMetadata(), notNullValue());
+        assertThat(event.getEventMetadata(), notNullValue());
         String partitionKey = record.dynamodb().keys().get(partitionKeyAttrName).s();
         String sortKey = record.dynamodb().keys().get(sortKeyAttrName).s();
-        assertThat(event.getMetadata().getAttribute(PARTITION_KEY_METADATA_ATTRIBUTE), equalTo(partitionKey));
-        assertThat(event.getMetadata().getAttribute(SORT_KEY_METADATA_ATTRIBUTE), equalTo(sortKey));
-        assertThat(event.getMetadata().getAttribute(PRIMARY_KEY_DOCUMENT_ID_METADATA_ATTRIBUTE), equalTo(partitionKey + "|" + sortKey));
-        assertThat(event.getMetadata().getAttribute(EVENT_NAME_BULK_ACTION_METADATA_ATTRIBUTE), equalTo(OpenSearchBulkActions.INDEX.toString()));
-        assertThat(event.getMetadata().getAttribute(DDB_STREAM_EVENT_NAME_METADATA_ATTRIBUTE), equalTo("INSERT"));
-        assertThat(event.getMetadata().getAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE), equalTo(record.dynamodb().approximateCreationDateTime().toEpochMilli()));
+        assertThat(event.getEventMetadata().getAttribute(PARTITION_KEY_METADATA_ATTRIBUTE), equalTo(partitionKey));
+        assertThat(event.getEventMetadata().getAttribute(SORT_KEY_METADATA_ATTRIBUTE), equalTo(sortKey));
+        assertThat(event.getEventMetadata().getAttribute(PRIMARY_KEY_DOCUMENT_ID_METADATA_ATTRIBUTE), equalTo(partitionKey + "|" + sortKey));
+        assertThat(event.getEventMetadata().getAttribute(EVENT_NAME_BULK_ACTION_METADATA_ATTRIBUTE), equalTo(OpenSearchBulkActions.INDEX.toString()));
+        assertThat(event.getEventMetadata().getAttribute(DDB_STREAM_EVENT_NAME_METADATA_ATTRIBUTE), equalTo("INSERT"));
+        assertThat(event.getEventMetadata().getAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE), equalTo(record.dynamodb().approximateCreationDateTime().toEpochMilli()));
 
         assertThat(event.get(partitionKeyAttrName, String.class), notNullValue());
         assertThat(event.get(sortKeyAttrName, String.class), notNullValue());
@@ -274,61 +274,61 @@ class StreamRecordConverterTest {
 
         JacksonEvent firstEventForSecond = (JacksonEvent) createdEvents.get(0).getData();
 
-        assertThat(firstEventForSecond.getMetadata(), notNullValue());
+        assertThat(firstEventForSecond.getEventMetadata(), notNullValue());
         String partitionKey = records.get(0).dynamodb().keys().get(partitionKeyAttrName).s();
         String sortKey = records.get(0).dynamodb().keys().get(sortKeyAttrName).s();
-        assertThat(firstEventForSecond.getMetadata().getAttribute(PARTITION_KEY_METADATA_ATTRIBUTE), equalTo(partitionKey));
-        assertThat(firstEventForSecond.getMetadata().getAttribute(SORT_KEY_METADATA_ATTRIBUTE), equalTo(sortKey));
-        assertThat(firstEventForSecond.getMetadata().getAttribute(PRIMARY_KEY_DOCUMENT_ID_METADATA_ATTRIBUTE), equalTo(partitionKey + "|" + sortKey));
-        assertThat(firstEventForSecond.getMetadata().getAttribute(EVENT_NAME_BULK_ACTION_METADATA_ATTRIBUTE), equalTo(OpenSearchBulkActions.INDEX.toString()));
-        assertThat(firstEventForSecond.getMetadata().getAttribute(DDB_STREAM_EVENT_NAME_METADATA_ATTRIBUTE), equalTo("INSERT"));
-        assertThat(firstEventForSecond.getMetadata().getAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE), equalTo(timestamp.toEpochMilli()));
-        assertThat(firstEventForSecond.getMetadata().getAttribute(EVENT_VERSION_FROM_TIMESTAMP), equalTo(timestamp.toEpochMilli() * 1000));
+        assertThat(firstEventForSecond.getEventMetadata().getAttribute(PARTITION_KEY_METADATA_ATTRIBUTE), equalTo(partitionKey));
+        assertThat(firstEventForSecond.getEventMetadata().getAttribute(SORT_KEY_METADATA_ATTRIBUTE), equalTo(sortKey));
+        assertThat(firstEventForSecond.getEventMetadata().getAttribute(PRIMARY_KEY_DOCUMENT_ID_METADATA_ATTRIBUTE), equalTo(partitionKey + "|" + sortKey));
+        assertThat(firstEventForSecond.getEventMetadata().getAttribute(EVENT_NAME_BULK_ACTION_METADATA_ATTRIBUTE), equalTo(OpenSearchBulkActions.INDEX.toString()));
+        assertThat(firstEventForSecond.getEventMetadata().getAttribute(DDB_STREAM_EVENT_NAME_METADATA_ATTRIBUTE), equalTo("INSERT"));
+        assertThat(firstEventForSecond.getEventMetadata().getAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE), equalTo(timestamp.toEpochMilli()));
+        assertThat(firstEventForSecond.getEventMetadata().getAttribute(EVENT_VERSION_FROM_TIMESTAMP), equalTo(timestamp.toEpochMilli() * 1000));
         assertThat(firstEventForSecond.getEventHandle(), notNullValue());
         assertThat(firstEventForSecond.getEventHandle().getExternalOriginationTime(), equalTo(timestamp));
 
         JacksonEvent secondEventForSameSecond = (JacksonEvent) createdEvents.get(1).getData();
 
-        assertThat(secondEventForSameSecond.getMetadata(), notNullValue());
+        assertThat(secondEventForSameSecond.getEventMetadata(), notNullValue());
         String secondPartitionKey = records.get(1).dynamodb().keys().get(partitionKeyAttrName).s();
         String secondSortKey = records.get(1).dynamodb().keys().get(sortKeyAttrName).s();
-        assertThat(secondEventForSameSecond.getMetadata().getAttribute(PARTITION_KEY_METADATA_ATTRIBUTE), equalTo(secondPartitionKey));
-        assertThat(secondEventForSameSecond.getMetadata().getAttribute(SORT_KEY_METADATA_ATTRIBUTE), equalTo(secondSortKey));
-        assertThat(secondEventForSameSecond.getMetadata().getAttribute(PRIMARY_KEY_DOCUMENT_ID_METADATA_ATTRIBUTE), equalTo(secondPartitionKey + "|" + secondSortKey));
-        assertThat(secondEventForSameSecond.getMetadata().getAttribute(EVENT_NAME_BULK_ACTION_METADATA_ATTRIBUTE), equalTo(OpenSearchBulkActions.INDEX.toString()));
-        assertThat(secondEventForSameSecond.getMetadata().getAttribute(DDB_STREAM_EVENT_NAME_METADATA_ATTRIBUTE), equalTo("INSERT"));
-        assertThat(secondEventForSameSecond.getMetadata().getAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE), equalTo(timestamp.toEpochMilli()));
-        assertThat(secondEventForSameSecond.getMetadata().getAttribute(EVENT_VERSION_FROM_TIMESTAMP), equalTo(timestamp.toEpochMilli() * 1000 + 1));
+        assertThat(secondEventForSameSecond.getEventMetadata().getAttribute(PARTITION_KEY_METADATA_ATTRIBUTE), equalTo(secondPartitionKey));
+        assertThat(secondEventForSameSecond.getEventMetadata().getAttribute(SORT_KEY_METADATA_ATTRIBUTE), equalTo(secondSortKey));
+        assertThat(secondEventForSameSecond.getEventMetadata().getAttribute(PRIMARY_KEY_DOCUMENT_ID_METADATA_ATTRIBUTE), equalTo(secondPartitionKey + "|" + secondSortKey));
+        assertThat(secondEventForSameSecond.getEventMetadata().getAttribute(EVENT_NAME_BULK_ACTION_METADATA_ATTRIBUTE), equalTo(OpenSearchBulkActions.INDEX.toString()));
+        assertThat(secondEventForSameSecond.getEventMetadata().getAttribute(DDB_STREAM_EVENT_NAME_METADATA_ATTRIBUTE), equalTo("INSERT"));
+        assertThat(secondEventForSameSecond.getEventMetadata().getAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE), equalTo(timestamp.toEpochMilli()));
+        assertThat(secondEventForSameSecond.getEventMetadata().getAttribute(EVENT_VERSION_FROM_TIMESTAMP), equalTo(timestamp.toEpochMilli() * 1000 + 1));
         assertThat(secondEventForSameSecond.getEventHandle(), notNullValue());
         assertThat(secondEventForSameSecond.getEventHandle().getExternalOriginationTime(), equalTo(timestamp));
 
         JacksonEvent thirdEventWithOlderSecond = (JacksonEvent) createdEvents.get(2).getData();
 
-        assertThat(thirdEventWithOlderSecond.getMetadata(), notNullValue());
+        assertThat(thirdEventWithOlderSecond.getEventMetadata(), notNullValue());
         String thirdPartitionKey = records.get(2).dynamodb().keys().get(partitionKeyAttrName).s();
         String thirdSortKey = records.get(2).dynamodb().keys().get(sortKeyAttrName).s();
-        assertThat(thirdEventWithOlderSecond.getMetadata().getAttribute(PARTITION_KEY_METADATA_ATTRIBUTE), equalTo(thirdPartitionKey));
-        assertThat(thirdEventWithOlderSecond.getMetadata().getAttribute(SORT_KEY_METADATA_ATTRIBUTE), equalTo(thirdSortKey));
-        assertThat(thirdEventWithOlderSecond.getMetadata().getAttribute(PRIMARY_KEY_DOCUMENT_ID_METADATA_ATTRIBUTE), equalTo(thirdPartitionKey + "|" + thirdSortKey));
-        assertThat(thirdEventWithOlderSecond.getMetadata().getAttribute(EVENT_NAME_BULK_ACTION_METADATA_ATTRIBUTE), equalTo(OpenSearchBulkActions.INDEX.toString()));
-        assertThat(thirdEventWithOlderSecond.getMetadata().getAttribute(DDB_STREAM_EVENT_NAME_METADATA_ATTRIBUTE), equalTo("INSERT"));
-        assertThat(thirdEventWithOlderSecond.getMetadata().getAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE), equalTo(olderSecond.toEpochMilli()));
-        assertThat(thirdEventWithOlderSecond.getMetadata().getAttribute(EVENT_VERSION_FROM_TIMESTAMP), equalTo(olderSecond.toEpochMilli() * 1000));
+        assertThat(thirdEventWithOlderSecond.getEventMetadata().getAttribute(PARTITION_KEY_METADATA_ATTRIBUTE), equalTo(thirdPartitionKey));
+        assertThat(thirdEventWithOlderSecond.getEventMetadata().getAttribute(SORT_KEY_METADATA_ATTRIBUTE), equalTo(thirdSortKey));
+        assertThat(thirdEventWithOlderSecond.getEventMetadata().getAttribute(PRIMARY_KEY_DOCUMENT_ID_METADATA_ATTRIBUTE), equalTo(thirdPartitionKey + "|" + thirdSortKey));
+        assertThat(thirdEventWithOlderSecond.getEventMetadata().getAttribute(EVENT_NAME_BULK_ACTION_METADATA_ATTRIBUTE), equalTo(OpenSearchBulkActions.INDEX.toString()));
+        assertThat(thirdEventWithOlderSecond.getEventMetadata().getAttribute(DDB_STREAM_EVENT_NAME_METADATA_ATTRIBUTE), equalTo("INSERT"));
+        assertThat(thirdEventWithOlderSecond.getEventMetadata().getAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE), equalTo(olderSecond.toEpochMilli()));
+        assertThat(thirdEventWithOlderSecond.getEventMetadata().getAttribute(EVENT_VERSION_FROM_TIMESTAMP), equalTo(olderSecond.toEpochMilli() * 1000));
         assertThat(thirdEventWithOlderSecond.getEventHandle(), notNullValue());
         assertThat(thirdEventWithOlderSecond.getEventHandle().getExternalOriginationTime(), equalTo(olderSecond));
 
         JacksonEvent fourthEventWithNewerSecond = (JacksonEvent) createdEvents.get(3).getData();
 
-        assertThat(fourthEventWithNewerSecond.getMetadata(), notNullValue());
+        assertThat(fourthEventWithNewerSecond.getEventMetadata(), notNullValue());
         String fourthPartitionKey = records.get(3).dynamodb().keys().get(partitionKeyAttrName).s();
         String fourthSortKey = records.get(3).dynamodb().keys().get(sortKeyAttrName).s();
-        assertThat(fourthEventWithNewerSecond.getMetadata().getAttribute(PARTITION_KEY_METADATA_ATTRIBUTE), equalTo(fourthPartitionKey));
-        assertThat(fourthEventWithNewerSecond.getMetadata().getAttribute(SORT_KEY_METADATA_ATTRIBUTE), equalTo(fourthSortKey));
-        assertThat(fourthEventWithNewerSecond.getMetadata().getAttribute(PRIMARY_KEY_DOCUMENT_ID_METADATA_ATTRIBUTE), equalTo(fourthPartitionKey + "|" + fourthSortKey));
-        assertThat(fourthEventWithNewerSecond.getMetadata().getAttribute(EVENT_NAME_BULK_ACTION_METADATA_ATTRIBUTE), equalTo(OpenSearchBulkActions.INDEX.toString()));
-        assertThat(fourthEventWithNewerSecond.getMetadata().getAttribute(DDB_STREAM_EVENT_NAME_METADATA_ATTRIBUTE), equalTo("INSERT"));
-        assertThat(fourthEventWithNewerSecond.getMetadata().getAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE), equalTo(newerSecond.toEpochMilli()));
-        assertThat(fourthEventWithNewerSecond.getMetadata().getAttribute(EVENT_VERSION_FROM_TIMESTAMP), equalTo(newerSecond.toEpochMilli() * 1000));
+        assertThat(fourthEventWithNewerSecond.getEventMetadata().getAttribute(PARTITION_KEY_METADATA_ATTRIBUTE), equalTo(fourthPartitionKey));
+        assertThat(fourthEventWithNewerSecond.getEventMetadata().getAttribute(SORT_KEY_METADATA_ATTRIBUTE), equalTo(fourthSortKey));
+        assertThat(fourthEventWithNewerSecond.getEventMetadata().getAttribute(PRIMARY_KEY_DOCUMENT_ID_METADATA_ATTRIBUTE), equalTo(fourthPartitionKey + "|" + fourthSortKey));
+        assertThat(fourthEventWithNewerSecond.getEventMetadata().getAttribute(EVENT_NAME_BULK_ACTION_METADATA_ATTRIBUTE), equalTo(OpenSearchBulkActions.INDEX.toString()));
+        assertThat(fourthEventWithNewerSecond.getEventMetadata().getAttribute(DDB_STREAM_EVENT_NAME_METADATA_ATTRIBUTE), equalTo("INSERT"));
+        assertThat(fourthEventWithNewerSecond.getEventMetadata().getAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE), equalTo(newerSecond.toEpochMilli()));
+        assertThat(fourthEventWithNewerSecond.getEventMetadata().getAttribute(EVENT_VERSION_FROM_TIMESTAMP), equalTo(newerSecond.toEpochMilli() * 1000));
         assertThat(fourthEventWithNewerSecond.getEventHandle(), notNullValue());
         assertThat(fourthEventWithNewerSecond.getEventHandle().getExternalOriginationTime(), equalTo(newerSecond));
 

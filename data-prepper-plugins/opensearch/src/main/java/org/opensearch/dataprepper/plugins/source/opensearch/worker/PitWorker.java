@@ -206,8 +206,8 @@ public class PitWorker implements SearchWorker, Runnable {
                 } catch (Exception e) {
                     openSearchSourcePluginMetrics.getProcessingErrorsCounter().increment();
                     LOG.error("Failed writing OpenSearch documents to buffer. The last document created has document id '{}' from index '{}' : {}",
-                            record.getData().getMetadata().getAttribute(DOCUMENT_ID_METADATA_ATTRIBUTE_NAME),
-                            record.getData().getMetadata().getAttribute(INDEX_METADATA_ATTRIBUTE_NAME), e.getMessage());
+                            record.getData().getEventMetadata().getAttribute(DOCUMENT_ID_METADATA_ATTRIBUTE_NAME),
+                            record.getData().getEventMetadata().getAttribute(INDEX_METADATA_ATTRIBUTE_NAME), e.getMessage());
                 }
             });
 

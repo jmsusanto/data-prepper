@@ -197,7 +197,7 @@ public class OpenSearchRuleProvider implements RuleProvider {
                 .collect(Collectors.toSet());
 
         return dataType -> {
-            final String index = dataType.getMetadataValue(OpenSearchDocMetadata.INDEX.getFieldName());
+            final String index = dataType.getDataTypeMetadataValue(OpenSearchDocMetadata.INDEX.getFieldName());
             if (index == null) {
                 return false;
             }

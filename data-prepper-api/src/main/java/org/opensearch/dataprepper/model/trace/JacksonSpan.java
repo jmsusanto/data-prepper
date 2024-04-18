@@ -65,7 +65,7 @@ public class JacksonSpan extends JacksonEvent implements Span {
     protected JacksonSpan(final Builder builder) {
         super(builder);
 
-        checkArgument(this.getMetadata().getEventType().equals("TRACE"), "eventType must be of type Trace");
+        checkArgument(this.getEventMetadata().getEventType().equals("TRACE"), "eventType must be of type Trace");
     }
 
     private JacksonSpan(final JacksonSpan otherSpan) {
@@ -182,7 +182,7 @@ public class JacksonSpan extends JacksonEvent implements Span {
         } else {
             return JacksonSpan.builder()
                     .withData(span.toMap())
-                    .withEventMetadata(span.getMetadata())
+                    .withEventMetadata(span.getEventMetadata())
                     .build();
         }
     }

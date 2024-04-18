@@ -367,7 +367,7 @@ public class JacksonEvent implements Event {
     }
 
     @Override
-    public EventMetadata getMetadata() {
+    public EventMetadata getEventMetadata() {
         return eventMetadata;
     }
 
@@ -477,7 +477,7 @@ public class JacksonEvent implements Event {
         } else {
             return JacksonEvent.builder()
                     .withData(event.toMap())
-                    .withEventMetadata(event.getMetadata())
+                    .withEventMetadata(event.getEventMetadata())
                     .build();
         }
     }
@@ -609,7 +609,7 @@ public class JacksonEvent implements Event {
 
             final String tagsKey = getTagsKey();
             if (tagsKey != null) {
-                final JsonNode tagsNode = mapper.valueToTree(event.getMetadata().getTags());
+                final JsonNode tagsNode = mapper.valueToTree(event.getEventMetadata().getTags());
                 return jsonString.substring(0, jsonString.length() - 1) + ",\"" + tagsKey + "\":" + tagsNode.toString() + "}";
             }
             return jsonString;

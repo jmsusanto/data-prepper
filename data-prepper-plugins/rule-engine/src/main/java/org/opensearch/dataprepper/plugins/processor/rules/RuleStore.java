@@ -5,17 +5,24 @@ import java.util.List;
 
 // TODO - does this need locking?
 public class RuleStore {
-    private List<Rule> rules;
+    private List<StatelessRule> statelessRules;
+    private List<StatefulRule> statefulRules;
 
     public RuleStore() {
-        this.rules = new ArrayList<>();
+        this.statelessRules = new ArrayList<>();
+        this.statefulRules = new ArrayList<>();
     }
 
-    public void updateRuleStore(final List<Rule> updatedRules) {
-        rules = updatedRules;
+    public void updateRuleStore(final List<StatelessRule> updatedStatelessRules, final List<StatefulRule> updatedStatefulRules) {
+        statelessRules = updatedStatelessRules;
+        statefulRules = updatedStatefulRules;
     }
 
-    public List<Rule> getRules() {
-        return rules;
+    public List<StatelessRule> getRules() {
+        return statelessRules;
+    }
+
+    public List<StatefulRule> getStatefulRules() {
+        return statefulRules;
     }
 }

@@ -341,7 +341,7 @@ class MapToListProcessorTest {
         final Event resultEvent = resultRecord.get(0).getData();
         assertThat(resultEvent.containsKey("my-list"), is(false));
         assertSourceMapUnchanged(resultEvent);
-        assertThat(resultEvent.getMetadata().getTags(), is(new HashSet<>(testTags)));
+        assertThat(resultEvent.getEventMetadata().getTags(), is(new HashSet<>(testTags)));
     }
 
     private MapToListProcessor createObjectUnderTest() {

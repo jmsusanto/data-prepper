@@ -64,7 +64,7 @@ class FileSinkTests {
                 .withEventType("event")
                 .withData(Map.of(TEST_KEY, TEST_DATA_1))
                 .build();
-        event.getMetadata().addTags(List.of(tagStr1, tagStr2));
+        event.getEventMetadata().addTags(List.of(tagStr1, tagStr2));
         TEST_RECORD1 = new Record<>(event);
         TEST_RECORDS.add(TEST_RECORD1);
         event = JacksonEvent.builder()

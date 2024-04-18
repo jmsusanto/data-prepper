@@ -609,8 +609,8 @@ public class JacksonSpanTest {
                     .build();
 
             assertThat(jacksonSpan, is(notNullValue()));
-            assertThat(jacksonSpan.getMetadata(), is(notNullValue()));
-            assertThat(jacksonSpan.getMetadata().getTimeReceived(), equalTo(now));
+            assertThat(jacksonSpan.getEventMetadata(), is(notNullValue()));
+            assertThat(jacksonSpan.getEventMetadata().getTimeReceived(), equalTo(now));
         }
 
         @Test
@@ -677,8 +677,8 @@ public class JacksonSpanTest {
                     .build();
 
             assertThat(jacksonSpan, is(notNullValue()));
-            assertThat(jacksonSpan.getMetadata(), is(notNullValue()));
-            assertThat(jacksonSpan.getMetadata().getTimeReceived(), equalTo(now));
+            assertThat(jacksonSpan.getEventMetadata(), is(notNullValue()));
+            assertThat(jacksonSpan.getEventMetadata().getTimeReceived(), equalTo(now));
             assertThat(jacksonSpan.toMap().get("traceId"), equalTo(traceId));
             assertThat(jacksonSpan.toMap().get("kind"), equalTo(kind));
             assertThat(jacksonSpan.toMap().get("traceGroup"), equalTo(traceGroup));
@@ -699,9 +699,9 @@ public class JacksonSpanTest {
 
         assertThat(createdEvent.toMap(), equalTo(jacksonSpan.toMap()));
 
-        assertThat(createdEvent.getMetadata(), notNullValue());
-        assertThat(createdEvent.getMetadata(), not(sameInstance(jacksonSpan.getMetadata())));
-        assertThat(createdEvent.getMetadata(), equalTo(jacksonSpan.getMetadata()));
+        assertThat(createdEvent.getEventMetadata(), notNullValue());
+        assertThat(createdEvent.getEventMetadata(), not(sameInstance(jacksonSpan.getEventMetadata())));
+        assertThat(createdEvent.getEventMetadata(), equalTo(jacksonSpan.getEventMetadata()));
     }
 
     @Test
@@ -709,7 +709,7 @@ public class JacksonSpanTest {
         final EventMetadata eventMetadata = mock(EventMetadata.class);
         final Span originalSpan = mock(Span.class);
         when(originalSpan.toMap()).thenReturn(jacksonSpan.toMap());
-        when(originalSpan.getMetadata()).thenReturn(eventMetadata);
+        when(originalSpan.getEventMetadata()).thenReturn(eventMetadata);
         when(eventMetadata.getEventType()).thenReturn("TRACE");
 
         final JacksonSpan createdEvent = JacksonSpan.fromSpan(originalSpan);
@@ -718,8 +718,8 @@ public class JacksonSpanTest {
 
         assertThat(createdEvent.toMap(), equalTo(jacksonSpan.toMap()));
 
-        assertThat(createdEvent.getMetadata(), notNullValue());
-        assertThat(createdEvent.getMetadata(), not(sameInstance(jacksonSpan.getMetadata())));
-        assertThat(createdEvent.getMetadata().getEventType(), equalTo("TRACE"));
+        assertThat(createdEvent.getEventMetadata(), notNullValue());
+        assertThat(createdEvent.getEventMetadata(), not(sameInstance(jacksonSpan.getEventMetadata())));
+        assertThat(createdEvent.getEventMetadata().getEventType(), equalTo("TRACE"));
     }
 }

@@ -6,8 +6,8 @@ import org.opensearch.dataprepper.plugins.processor.provider.rules.model.RuleDat
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class RuleRefresher implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(RuleRefresher.class);
@@ -28,10 +28,11 @@ public class RuleRefresher implements Runnable {
     public void run() {
         try {
             final List<RuleData> ruleData = ruleProvider.getRules();
-            final List<Rule> rules = ruleData.stream()
-                    .map(ruleParser::parseRule)
-                    .collect(Collectors.toList());
-            sigmaRuleStore.updateRuleStore(rules);
+            final List<StatelessRule> statelessRules = new ArrayList<>();
+            final List<StatefulRule> statefulRules = new ArrayList<>();
+
+            ruleData.forEach(ruleDatum -> ruleParser.parseRule(ruleDatum, statelessRules::add, statefulRules::add));
+            sigmaRuleStore.updateRuleStore(statelessRules, statefulRules);
         } catch (final Exception e) {
             LOG.error("Caught exception refreshing rules", e);
         }

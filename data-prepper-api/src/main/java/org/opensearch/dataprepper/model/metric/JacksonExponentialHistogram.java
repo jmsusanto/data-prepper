@@ -42,7 +42,7 @@ public class JacksonExponentialHistogram extends JacksonMetric implements Expone
     protected JacksonExponentialHistogram(JacksonExponentialHistogram.Builder builder, boolean flattenAttributes) {
         super(builder, flattenAttributes);
 
-        checkArgument(this.getMetadata().getEventType().equals(EventType.METRIC.toString()), "eventType must be of type Metric");
+        checkArgument(this.getEventMetadata().getEventType().equals(EventType.METRIC.toString()), "eventType must be of type Metric");
     }
 
     public static JacksonExponentialHistogram.Builder builder() {

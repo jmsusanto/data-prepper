@@ -139,7 +139,7 @@ class GenericExpressionEvaluator_ConditionalIT {
         String testTag3 = RandomStringUtils.randomAlphabetic(6);
         String testTag4 = RandomStringUtils.randomAlphabetic(7);
 
-        longEvent.getMetadata().addTags(List.of(testTag1, testTag2, testTag3));
+        longEvent.getEventMetadata().addTags(List.of(testTag1, testTag2, testTag3));
 
         Random random = new Random();
         int testStringLength = random.nextInt(10);
@@ -230,7 +230,7 @@ class GenericExpressionEvaluator_ConditionalIT {
                 .build();
         String testTag1 = RandomStringUtils.randomAlphabetic(6);
         String testTag2 = RandomStringUtils.randomAlphabetic(7);
-        tagEvent.getMetadata().addTags(List.of(testTag1, testTag2));
+        tagEvent.getEventMetadata().addTags(List.of(testTag1, testTag2));
         String testMetadataKey = RandomStringUtils.randomAlphabetic(5);
 
         int testStringLength = random.nextInt(10);

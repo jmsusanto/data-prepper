@@ -73,7 +73,7 @@ public class StringProcessor implements Processor<Record<Event>, Record<Event>> 
             try {
                 final Map<String, Object> newData = processEventJson(eventJson);
                 final Event newRecordEvent = JacksonEvent.builder()
-                        .withEventMetadata(recordEvent.getMetadata())
+                        .withEventMetadata(recordEvent.getEventMetadata())
                         .withData(newData)
                         .build();
                 modifiedRecords.add(new Record<>(newRecordEvent));

@@ -1,24 +1,22 @@
 package org.opensearch.dataprepper.plugins.processor.model.matches;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.opensearch.dataprepper.plugins.processor.model.datatypes.DataType;
 import org.opensearch.dataprepper.plugins.processor.rules.Rule;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Match {
-    private final DataType dataType;
-    private final List<Rule> ruleMatches;
-
-    public Match(final DataType dataType, final List<Rule> ruleMatches) {
-        this.dataType = dataType;
-        this.ruleMatches = ruleMatches;
-    }
-
-    public DataType getDataType() {
-        return dataType;
-    }
-
-    public List<Rule> getRuleMatches() {
-        return ruleMatches;
-    }
+@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Match implements Serializable {
+    private DataType dataType;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private List<Rule> rules;
 }

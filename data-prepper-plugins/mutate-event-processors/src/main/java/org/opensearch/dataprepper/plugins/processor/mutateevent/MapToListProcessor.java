@@ -85,11 +85,11 @@ public class MapToListProcessor extends AbstractProcessor<Record<Event>, Record<
                     }
                 } catch (Exception e) {
                     LOG.error("Fail to perform Map to List operation", e);
-                    recordEvent.getMetadata().addTags(config.getTagsOnFailure());
+                    recordEvent.getEventMetadata().addTags(config.getTagsOnFailure());
                 }
             } catch (final Exception e) {
                 LOG.error(EVENT, "There was an exception while processing Event [{}]", recordEvent, e);
-                recordEvent.getMetadata().addTags(config.getTagsOnFailure());
+                recordEvent.getEventMetadata().addTags(config.getTagsOnFailure());
             }
         }
         return records;

@@ -93,9 +93,9 @@ public abstract class RecordConverter {
         if (eventName != null) {
             final Instant externalOriginationTime = Instant.ofEpochMilli(eventCreationTimeMillis);
             event.getEventHandle().setExternalOriginationTime(externalOriginationTime);
-            event.getMetadata().setExternalOriginationTime(externalOriginationTime);
+            event.getEventMetadata().setExternalOriginationTime(externalOriginationTime);
         }
-        EventMetadata eventMetadata = event.getMetadata();
+        EventMetadata eventMetadata = event.getEventMetadata();
 
         eventMetadata.setAttribute(EVENT_TABLE_NAME_METADATA_ATTRIBUTE, tableInfo.getTableName());
         eventMetadata.setAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE, eventCreationTimeMillis);

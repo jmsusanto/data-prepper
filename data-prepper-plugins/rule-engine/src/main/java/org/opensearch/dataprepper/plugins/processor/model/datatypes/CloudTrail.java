@@ -26,4 +26,9 @@ public class CloudTrail extends DataType {
             default: throw new IllegalArgumentException("Field " + fieldName + " does not exist in class " + getClass().getName());
         }
     }
+
+    @Override
+    public String getTimeFieldName() {
+        return "eventTime";
+    }
 }

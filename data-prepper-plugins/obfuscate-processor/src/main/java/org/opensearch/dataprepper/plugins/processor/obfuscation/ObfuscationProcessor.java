@@ -125,7 +125,7 @@ public class ObfuscationProcessor extends AbstractProcessor<Record<Event>, Recor
 
                 // No changes means it does not match any patterns
                 if (rawValue.equals(newValue)) {
-                    recordEvent.getMetadata().addTags(obfuscationProcessorConfig.getTagsOnMatchFailure());
+                    recordEvent.getEventMetadata().addTags(obfuscationProcessorConfig.getTagsOnMatchFailure());
                 }
 
                 // Update the event record.

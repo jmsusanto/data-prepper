@@ -133,9 +133,9 @@ public class DecompressProcessorTest {
         assertThat(result.get(0), notNullValue());
         assertThat(result.get(0).getData(), notNullValue());
         assertThat(result.get(0).getData().get(key, String.class), equalTo(compressedValue));
-        assertThat(result.get(0).getData().getMetadata().getTags(), notNullValue());
-        assertThat(result.get(0).getData().getMetadata().getTags().size(), equalTo(1));
-        assertThat(result.get(0).getData().getMetadata().getTags().contains(tagForFailure), equalTo(true));
+        assertThat(result.get(0).getData().getEventMetadata().getTags(), notNullValue());
+        assertThat(result.get(0).getData().getEventMetadata().getTags().size(), equalTo(1));
+        assertThat(result.get(0).getData().getEventMetadata().getTags().contains(tagForFailure), equalTo(true));
 
         verifyNoInteractions(decompressionEngine);
         verify(decompressionProcessingErrors).increment();
@@ -167,9 +167,9 @@ public class DecompressProcessorTest {
         assertThat(result.get(0), notNullValue());
         assertThat(result.get(0).getData(), notNullValue());
         assertThat(result.get(0).getData().get(key, String.class), equalTo(compressedValue));
-        assertThat(result.get(0).getData().getMetadata().getTags(), notNullValue());
-        assertThat(result.get(0).getData().getMetadata().getTags().size(), equalTo(1));
-        assertThat(result.get(0).getData().getMetadata().getTags().contains(tagForFailure), equalTo(true));
+        assertThat(result.get(0).getData().getEventMetadata().getTags(), notNullValue());
+        assertThat(result.get(0).getData().getEventMetadata().getTags().size(), equalTo(1));
+        assertThat(result.get(0).getData().getEventMetadata().getTags().contains(tagForFailure), equalTo(true));
 
         verify(decompressionProcessingErrors).increment();
     }
@@ -196,9 +196,9 @@ public class DecompressProcessorTest {
         assertThat(result.get(0), notNullValue());
         assertThat(result.get(0).getData(), notNullValue());
         assertThat(result.get(0).getData().get(key, String.class), equalTo(compressedValue));
-        assertThat(result.get(0).getData().getMetadata().getTags(), notNullValue());
-        assertThat(result.get(0).getData().getMetadata().getTags().size(), equalTo(1));
-        assertThat(result.get(0).getData().getMetadata().getTags().contains(tagForFailure), equalTo(true));
+        assertThat(result.get(0).getData().getEventMetadata().getTags(), notNullValue());
+        assertThat(result.get(0).getData().getEventMetadata().getTags().size(), equalTo(1));
+        assertThat(result.get(0).getData().getEventMetadata().getTags().contains(tagForFailure), equalTo(true));
 
         verifyNoInteractions(decoderEngine, decompressionEngine);
         verify(decompressionProcessingErrors).increment();

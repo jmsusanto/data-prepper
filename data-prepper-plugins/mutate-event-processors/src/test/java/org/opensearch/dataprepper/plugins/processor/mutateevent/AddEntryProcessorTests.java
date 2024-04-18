@@ -407,7 +407,7 @@ public class AddEntryProcessorTests {
         final List<Record<Event>> editedRecords = (List<Record<Event>>) processor.doExecute(Collections.singletonList(record));
 
         Event event = editedRecords.get(0).getData();
-        Map<String, Object> attributes = event.getMetadata().getAttributes();
+        Map<String, Object> attributes = event.getEventMetadata().getAttributes();
         assertThat(event.get("date", Object.class), equalTo("date-value"));
         assertThat(event.get("time", Object.class), equalTo("time-value"));
         assertThat(attributes.containsKey("data-time"), equalTo(false));
@@ -444,7 +444,7 @@ public class AddEntryProcessorTests {
         Event event = editedRecords.get(0).getData();
         assertThat(event.containsKey("message"), is(true));
         assertThat(event.get("message", Object.class), equalTo("thisisamessage"));
-        Map<String, Object> attributes = event.getMetadata().getAttributes();
+        Map<String, Object> attributes = event.getEventMetadata().getAttributes();
         assertThat(attributes.containsKey("newMessage"), is(false));
     }
 
@@ -460,7 +460,7 @@ public class AddEntryProcessorTests {
         final Record<Event> record = getEventWithMetadata("message", Map.of("key1", "value1"));
         final List<Record<Event>> editedRecords = (List<Record<Event>>) processor.doExecute(Collections.singletonList(record));
 
-        Map<String, Object> attributes = editedRecords.get(0).getData().getMetadata().getAttributes();
+        Map<String, Object> attributes = editedRecords.get(0).getData().getEventMetadata().getAttributes();
         assertThat(attributes.get("newField"), equalTo("newValue"));
         assertThat(attributes.get("newIntField"), equalTo(123));
         assertThat(attributes.get("newBooleanField"), equalTo(true));
@@ -476,7 +476,7 @@ public class AddEntryProcessorTests {
         final Record<Event> record = getEventWithMetadata("message", Map.of("date", "date-value", "time", "time-value"));
         final List<Record<Event>> editedRecords = (List<Record<Event>>) processor.doExecute(Collections.singletonList(record));
 
-        Map<String, Object> attributes = editedRecords.get(0).getData().getMetadata().getAttributes();
+        Map<String, Object> attributes = editedRecords.get(0).getData().getEventMetadata().getAttributes();
         assertThat(attributes.get("date"), equalTo("date-value"));
         assertThat(attributes.get("time"), equalTo("time-value"));
         assertThat(attributes.containsKey("date-time"), equalTo(false));
@@ -492,7 +492,7 @@ public class AddEntryProcessorTests {
         final Record<Event> record = getEventWithMetadata("message", Map.of("date", "date-value", "time", "time-value"));
         final List<Record<Event>> editedRecords = (List<Record<Event>>) processor.doExecute(Collections.singletonList(record));
 
-        Map<String, Object> attributes = editedRecords.get(0).getData().getMetadata().getAttributes();
+        Map<String, Object> attributes = editedRecords.get(0).getData().getEventMetadata().getAttributes();
         assertThat(attributes.get("date"), equalTo("date-value"));
         assertThat(attributes.get("time"), equalTo("date-value time-value"));
         assertThat(attributes.containsKey("date-time"), equalTo(false));
@@ -509,7 +509,7 @@ public class AddEntryProcessorTests {
         final Record<Event> record = getEventWithMetadata("message", Map.of("time", currentValue));
         final List<Record<Event>> editedRecords = (List<Record<Event>>) processor.doExecute(Collections.singletonList(record));
 
-        Map<String, Object> attributes = editedRecords.get(0).getData().getMetadata().getAttributes();
+        Map<String, Object> attributes = editedRecords.get(0).getData().getEventMetadata().getAttributes();
         assertThat(attributes.get("time"), equalTo(List.of(currentValue, "time-value2")));
     }
 
@@ -526,7 +526,7 @@ public class AddEntryProcessorTests {
         final Record<Event> record = getEventWithMetadata("message", Map.of("time", listValue));
         final List<Record<Event>> editedRecords = (List<Record<Event>>) processor.doExecute(Collections.singletonList(record));
 
-        Map<String, Object> attributes = editedRecords.get(0).getData().getMetadata().getAttributes();
+        Map<String, Object> attributes = editedRecords.get(0).getData().getEventMetadata().getAttributes();
         assertThat(attributes.get("time"), equalTo(List.of(currentItem, "time-value2")));
     }
 
@@ -621,7 +621,7 @@ public class AddEntryProcessorTests {
         String randomString = UUID.randomUUID().toString();
         when(expressionEvaluator.evaluate(valueExpression, record.getData())).thenReturn(randomString.length());
         final List<Record<Event>> editedRecords = (List<Record<Event>>) processor.doExecute(Collections.singletonList(record));
-        Map<String, Object> attributes = editedRecords.get(0).getData().getMetadata().getAttributes();
+        Map<String, Object> attributes = editedRecords.get(0).getData().getEventMetadata().getAttributes();
         assertThat(attributes.get("length_key"), equalTo(randomString.length()));
     }
 
@@ -634,7 +634,7 @@ public class AddEntryProcessorTests {
         String randomString = UUID.randomUUID().toString();
         when(expressionEvaluator.evaluate(valueExpression, record.getData())).thenReturn(randomString);
         final List<Record<Event>> editedRecords = (List<Record<Event>>) processor.doExecute(Collections.singletonList(record));
-        Map<String, Object> attributes = editedRecords.get(0).getData().getMetadata().getAttributes();
+        Map<String, Object> attributes = editedRecords.get(0).getData().getEventMetadata().getAttributes();
         assertThat(attributes.get("newkey"), equalTo(randomString));
     }
 

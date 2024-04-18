@@ -63,10 +63,10 @@ public class StringProcessorTests {
         final Event firstEvent = modifiedRecordEvents.get(0);
         final Event secondEvent = modifiedRecordEvents.get(1);
         assertTrue(firstEvent.containsKey(TEST_KEY));
-        assertThat(firstEvent.getMetadata().getEventType(), equalTo(TEST_EVENT_TYPE));
+        assertThat(firstEvent.getEventMetadata().getEventType(), equalTo(TEST_EVENT_TYPE));
         assertThat(firstEvent.get(TEST_KEY, String.class), equalTo(UPPERCASE_TEST_STRING.toUpperCase()));
         assertTrue(secondEvent.containsKey(TEST_KEY));
-        assertThat(secondEvent.getMetadata().getEventType(), equalTo(TEST_EVENT_TYPE));
+        assertThat(secondEvent.getEventMetadata().getEventType(), equalTo(TEST_EVENT_TYPE));
         assertThat(secondEvent.get(TEST_KEY, String.class), equalTo(LOWERCASE_TEST_STRING));
     }
 
@@ -83,10 +83,10 @@ public class StringProcessorTests {
         final Event firstEvent = modifiedRecordEvents.get(0);
         final Event secondEvent = modifiedRecordEvents.get(1);
         assertTrue(firstEvent.containsKey(TEST_KEY));
-        assertThat(firstEvent.getMetadata().getEventType(), equalTo(TEST_EVENT_TYPE));
+        assertThat(firstEvent.getEventMetadata().getEventType(), equalTo(TEST_EVENT_TYPE));
         assertThat(firstEvent.get(TEST_KEY, String.class), equalTo(UPPERCASE_TEST_STRING));
         assertTrue(secondEvent.containsKey(TEST_KEY));
-        assertThat(secondEvent.getMetadata().getEventType(), equalTo(TEST_EVENT_TYPE));
+        assertThat(secondEvent.getEventMetadata().getEventType(), equalTo(TEST_EVENT_TYPE));
         assertThat(secondEvent.get(TEST_KEY, String.class), equalTo(LOWERCASE_TEST_STRING.toLowerCase()));
     }
 
@@ -103,10 +103,10 @@ public class StringProcessorTests {
         final Event firstEvent = modifiedRecordEvents.get(0);
         final Event secondEvent = modifiedRecordEvents.get(1);
         assertTrue(firstEvent.containsKey(TEST_KEY));
-        assertThat(firstEvent.getMetadata().getEventType(), equalTo(TEST_EVENT_TYPE));
+        assertThat(firstEvent.getEventMetadata().getEventType(), equalTo(TEST_EVENT_TYPE));
         assertThat(firstEvent.get(TEST_KEY, String.class), equalTo(UPPERCASE_TEST_STRING.toUpperCase()));
         assertTrue(secondEvent.containsKey(TEST_KEY));
-        assertThat(secondEvent.getMetadata().getEventType(), equalTo(TEST_EVENT_TYPE));
+        assertThat(secondEvent.getEventMetadata().getEventType(), equalTo(TEST_EVENT_TYPE));
         assertThat(secondEvent.get(TEST_KEY, String.class), equalTo(LOWERCASE_TEST_STRING));
     }
 

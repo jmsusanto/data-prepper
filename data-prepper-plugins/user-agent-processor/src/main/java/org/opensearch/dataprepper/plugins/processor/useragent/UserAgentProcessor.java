@@ -61,7 +61,7 @@ public class UserAgentProcessor extends AbstractProcessor<Record<Event>, Record<
 
                 final List<String> tagsOnParseFailure = config.getTagsOnParseFailure();
                 if (Objects.nonNull(tagsOnParseFailure) && tagsOnParseFailure.size() > 0) {
-                    event.getMetadata().addTags(tagsOnParseFailure);
+                    event.getEventMetadata().addTags(tagsOnParseFailure);
                 }
             }
         }

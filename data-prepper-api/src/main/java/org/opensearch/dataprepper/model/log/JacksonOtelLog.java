@@ -40,7 +40,7 @@ public class JacksonOtelLog extends JacksonEvent implements OpenTelemetryLog {
     protected JacksonOtelLog(final JacksonOtelLog.Builder builder) {
         super(builder);
 
-        checkArgument(this.getMetadata().getEventType().equals("LOG"), "eventType must be of type Log");
+        checkArgument(this.getEventMetadata().getEventType().equals("LOG"), "eventType must be of type Log");
     }
 
     @Override

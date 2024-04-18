@@ -416,7 +416,7 @@ public class JacksonEventTest {
                 .withEventType(eventType)
                 .build();
 
-        assertThat(event.getMetadata().getEventType(), is(equalTo(eventType)));
+        assertThat(event.getEventMetadata().getEventType(), is(equalTo(eventType)));
         assertThat(event.getEventHandle(), is(notNullValue()));
         assertThat(event.getEventHandle().getInternalOriginationTime(), is(notNullValue()));
     }
@@ -431,7 +431,7 @@ public class JacksonEventTest {
                 .withTimeReceived(now)
                 .build();
 
-        assertThat(event.getMetadata().getTimeReceived(), is(equalTo(now)));
+        assertThat(event.getEventMetadata().getTimeReceived(), is(equalTo(now)));
         assertThat(event.getEventHandle(), is(notNullValue()));
         assertThat(event.getEventHandle().getInternalOriginationTime(), is(equalTo(now)));
     }
@@ -461,7 +461,7 @@ public class JacksonEventTest {
                 .withEventMetadataAttributes(testAttributes)
                 .build();
 
-        assertThat(event.getMetadata().getAttributes(), is(equalTo(testAttributes)));
+        assertThat(event.getEventMetadata().getAttributes(), is(equalTo(testAttributes)));
     }
 
     @Test
@@ -484,9 +484,9 @@ public class JacksonEventTest {
                 .withEventMetadata(metadata)
                 .build();
 
-        assertThat(event.getMetadata().getAttributes(), is(not(equalTo(testAttributes))));
-        assertThat(event.getMetadata().getTimeReceived(), is(not(equalTo(now))));
-        assertThat(event.getMetadata().getEventType(), is(equalTo(emEventType)));
+        assertThat(event.getEventMetadata().getAttributes(), is(not(equalTo(testAttributes))));
+        assertThat(event.getEventMetadata().getTimeReceived(), is(not(equalTo(now))));
+        assertThat(event.getEventMetadata().getEventType(), is(equalTo(emEventType)));
     }
 
     @Test
@@ -500,7 +500,7 @@ public class JacksonEventTest {
                 .withEventMetadata(metadata)
                 .build();
 
-        assertThat(event.getMetadata(), is(equalTo(metadata)));
+        assertThat(event.getEventMetadata(), is(equalTo(metadata)));
     }
 
 
@@ -690,9 +690,9 @@ public class JacksonEventTest {
         assertThat(createdEvent.toMap(), equalTo(dataObject));
         assertThat(createdEvent.getJsonNode(), not(sameInstance(originalEvent.getJsonNode())));
 
-        assertThat(createdEvent.getMetadata(), notNullValue());
-        assertThat(createdEvent.getMetadata(), not(sameInstance(originalEvent.getMetadata())));
-        assertThat(createdEvent.getMetadata(), equalTo(originalEvent.getMetadata()));
+        assertThat(createdEvent.getEventMetadata(), notNullValue());
+        assertThat(createdEvent.getEventMetadata(), not(sameInstance(originalEvent.getEventMetadata())));
+        assertThat(createdEvent.getEventMetadata(), equalTo(originalEvent.getEventMetadata()));
     }
 
     @Test
@@ -702,7 +702,7 @@ public class JacksonEventTest {
         final EventMetadata eventMetadata = mock(EventMetadata.class);
         final Event originalEvent = mock(Event.class);
         when(originalEvent.toMap()).thenReturn(dataObject);
-        when(originalEvent.getMetadata()).thenReturn(eventMetadata);
+        when(originalEvent.getEventMetadata()).thenReturn(eventMetadata);
 
         final JacksonEvent createdEvent = JacksonEvent.fromEvent(originalEvent);
 
@@ -711,8 +711,8 @@ public class JacksonEventTest {
 
         assertThat(createdEvent.toMap(), equalTo(dataObject));
 
-        assertThat(createdEvent.getMetadata(), notNullValue());
-        assertThat(createdEvent.getMetadata(), equalTo(eventMetadata));
+        assertThat(createdEvent.getEventMetadata(), notNullValue());
+        assertThat(createdEvent.getEventMetadata(), equalTo(eventMetadata));
     }
 
     @Test
@@ -723,7 +723,7 @@ public class JacksonEventTest {
                 .withEventType(eventType)
                 .withData(jsonString)
                 .build();
-        final EventMetadata eventMetadata = event.getMetadata();
+        final EventMetadata eventMetadata = event.getEventMetadata();
         eventMetadata.addTags(List.of("tag1", "tag2"));
         final String expectedJsonString = "{\"foo\":\"bar\",\"tags\":[\"tag1\",\"tag2\"]}";
         assertThat(event.jsonBuilder().includeTags("tags").toJsonString(), equalTo(expectedJsonString));

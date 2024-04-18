@@ -44,7 +44,7 @@ class HasTagsExpressionFunctionTest {
     public void generateTags(Event event, int numTags) {
         for (int i = 0; i < numTags; i++) {
             String tag = RandomStringUtils.randomAlphabetic(5);
-            testEvent.getMetadata().addTags(List.of(tag));
+            testEvent.getEventMetadata().addTags(List.of(tag));
             tags.add("\""+tag+"\"");
         }
     }

@@ -47,7 +47,7 @@ class DefaultLogEventBuilderFactoryTests {
         LogEventBuilder eventBuilder = (LogEventBuilder)baseEventBuilder.withEventMetadataAttributes(attributes).withData(data);
 
         JacksonLog log = (JacksonLog) eventBuilder.build();
-        EventMetadata eventMetadata = log.getMetadata();
+        EventMetadata eventMetadata = log.getEventMetadata();
         assertThat(eventMetadata.getTimeReceived(), not(equalTo(null)));
         assertThat(eventMetadata.getEventType(), equalTo(DefaultLogEventBuilderFactory.LOG_EVENT_TYPE));
         assertThat(eventMetadata.getAttributes(), equalTo(attributes));

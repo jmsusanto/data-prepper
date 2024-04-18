@@ -142,8 +142,8 @@ class NewlineDelimitedCodecTest {
             assertThat(record, notNullValue());
             assertThat(record.getData(), notNullValue());
             assertThat(record.getData().get("message", String.class), equalTo(linesList.get(i + skipLines)));
-            assertThat(record.getData().getMetadata(), notNullValue());
-            assertThat(record.getData().getMetadata().getEventType(), equalTo(EventType.LOG.toString()));
+            assertThat(record.getData().getEventMetadata(), notNullValue());
+            assertThat(record.getData().getEventMetadata().getEventType(), equalTo(EventType.LOG.toString()));
         }
     }
 
@@ -178,8 +178,8 @@ class NewlineDelimitedCodecTest {
             assertThat(record.getData(), notNullValue());
             assertThat(record.getData().get("event_header", String.class), equalTo(headerMessage));
             assertThat(record.getData().get("message", String.class), equalTo(linesList.get(i + headerOffset)));
-            assertThat(record.getData().getMetadata(), notNullValue());
-            assertThat(record.getData().getMetadata().getEventType(), equalTo(EventType.LOG.toString()));
+            assertThat(record.getData().getEventMetadata(), notNullValue());
+            assertThat(record.getData().getEventMetadata().getEventType(), equalTo(EventType.LOG.toString()));
         }
     }
 
@@ -205,8 +205,8 @@ class NewlineDelimitedCodecTest {
             assertThat(record.getData(), notNullValue());
             assertThat(record.getData().get("event_header", String.class), equalTo(headerMessage));
             assertThat(record.getData().get("message", String.class), equalTo(linesList.get(i + skipLines + headerOffset)));
-            assertThat(record.getData().getMetadata(), notNullValue());
-            assertThat(record.getData().getMetadata().getEventType(), equalTo(EventType.LOG.toString()));
+            assertThat(record.getData().getEventMetadata(), notNullValue());
+            assertThat(record.getData().getEventMetadata().getEventType(), equalTo(EventType.LOG.toString()));
         }
     }
 
@@ -232,8 +232,8 @@ class NewlineDelimitedCodecTest {
             assertThat(record.getData(), notNullValue());
             assertThat(record.getData().get("event_header", String.class), equalTo(headerMessage));
             assertThat(record.getData().get("message", String.class), equalTo(linesList.get(i + skipLines + headerOffset)));
-            assertThat(record.getData().getMetadata(), notNullValue());
-            assertThat(record.getData().getMetadata().getEventType(), equalTo(EventType.LOG.toString()));
+            assertThat(record.getData().getEventMetadata(), notNullValue());
+            assertThat(record.getData().getEventMetadata().getEventType(), equalTo(EventType.LOG.toString()));
         }
     }
 

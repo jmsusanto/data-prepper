@@ -156,17 +156,17 @@ class ExportRecordConverterTest {
         assertThat(recordArgumentCaptor.getValue().getData(), notNullValue());
         JacksonEvent event = (JacksonEvent) recordArgumentCaptor.getValue().getData();
 
-        assertThat(event.getMetadata(), notNullValue());
+        assertThat(event.getEventMetadata(), notNullValue());
 
-        assertThat(event.getMetadata().getAttribute(PARTITION_KEY_METADATA_ATTRIBUTE), equalTo(pk));
-        assertThat(event.getMetadata().getAttribute(SORT_KEY_METADATA_ATTRIBUTE), equalTo(sk));
-        assertThat(event.getMetadata().getAttribute(PRIMARY_KEY_DOCUMENT_ID_METADATA_ATTRIBUTE), equalTo(pk + "|" + sk));
-        assertThat(event.getMetadata().getAttribute(EVENT_NAME_BULK_ACTION_METADATA_ATTRIBUTE), equalTo(OpenSearchBulkActions.INDEX.toString()));
-        assertThat(event.getMetadata().getAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE), notNullValue());
-        assertThat(event.getMetadata().getAttribute(DDB_STREAM_EVENT_NAME_METADATA_ATTRIBUTE), nullValue());
-        assertThat(event.getMetadata().getAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE), notNullValue());
+        assertThat(event.getEventMetadata().getAttribute(PARTITION_KEY_METADATA_ATTRIBUTE), equalTo(pk));
+        assertThat(event.getEventMetadata().getAttribute(SORT_KEY_METADATA_ATTRIBUTE), equalTo(sk));
+        assertThat(event.getEventMetadata().getAttribute(PRIMARY_KEY_DOCUMENT_ID_METADATA_ATTRIBUTE), equalTo(pk + "|" + sk));
+        assertThat(event.getEventMetadata().getAttribute(EVENT_NAME_BULK_ACTION_METADATA_ATTRIBUTE), equalTo(OpenSearchBulkActions.INDEX.toString()));
+        assertThat(event.getEventMetadata().getAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE), notNullValue());
+        assertThat(event.getEventMetadata().getAttribute(DDB_STREAM_EVENT_NAME_METADATA_ATTRIBUTE), nullValue());
+        assertThat(event.getEventMetadata().getAttribute(EVENT_TIMESTAMP_METADATA_ATTRIBUTE), notNullValue());
         final long expectedVersion = (1700020441123L - VERSION_OVERLAP_TIME_FOR_EXPORT.toMillis()) * 1_000;
-        assertThat(event.getMetadata().getAttribute(EVENT_VERSION_FROM_TIMESTAMP), equalTo(expectedVersion));
+        assertThat(event.getEventMetadata().getAttribute(EVENT_VERSION_FROM_TIMESTAMP), equalTo(expectedVersion));
         assertThat(event.getEventHandle(), notNullValue());
         assertThat(event.getEventHandle().getExternalOriginationTime(), nullValue());
         verify(bytesReceivedSummary, times(1)).record(line.getBytes().length);
@@ -194,11 +194,11 @@ class ExportRecordConverterTest {
         assertThat(recordArgumentCaptor.getValue().getData(), notNullValue());
         JacksonEvent event = (JacksonEvent) recordArgumentCaptor.getValue().getData();
 
-        assertThat(event.getMetadata(), notNullValue());
+        assertThat(event.getEventMetadata(), notNullValue());
 
-        assertThat(event.getMetadata().getAttribute(PARTITION_KEY_METADATA_ATTRIBUTE), equalTo(expectedPartitionKey));
-        assertThat(event.getMetadata().getAttribute(SORT_KEY_METADATA_ATTRIBUTE), equalTo(expectedSortKey));
-        assertThat(event.getMetadata().getAttribute(PRIMARY_KEY_DOCUMENT_ID_METADATA_ATTRIBUTE), equalTo(expectedPartitionKey + "|" + expectedSortKey));
+        assertThat(event.getEventMetadata().getAttribute(PARTITION_KEY_METADATA_ATTRIBUTE), equalTo(expectedPartitionKey));
+        assertThat(event.getEventMetadata().getAttribute(SORT_KEY_METADATA_ATTRIBUTE), equalTo(expectedSortKey));
+        assertThat(event.getEventMetadata().getAttribute(PRIMARY_KEY_DOCUMENT_ID_METADATA_ATTRIBUTE), equalTo(expectedPartitionKey + "|" + expectedSortKey));
     }
 
     private static Stream<Arguments> decimalFormatKeysArgumentProvider() {

@@ -79,17 +79,17 @@ public class DecompressProcessor extends AbstractProcessor<Record<Event>, Record
                     } catch (final Exception e) {
                         LOG.error("Unable to decompress key {} using decompression type {}:",
                                 key, decompressProcessorConfig.getDecompressionType(), e);
-                        record.getData().getMetadata().addTags(decompressProcessorConfig.getTagsOnFailure());
+                        record.getData().getEventMetadata().addTags(decompressProcessorConfig.getTagsOnFailure());
                         decompressionProcessingErrors.increment();
                     }
                 }
             } catch (final DecodingException e) {
                 LOG.error("Unable to decode key with base64: {}", e.getMessage());
-                record.getData().getMetadata().addTags(decompressProcessorConfig.getTagsOnFailure());
+                record.getData().getEventMetadata().addTags(decompressProcessorConfig.getTagsOnFailure());
                 decompressionProcessingErrors.increment();
             } catch (final Exception e) {
                 LOG.error("An uncaught exception occurred while decompressing Events", e);
-                record.getData().getMetadata().addTags(decompressProcessorConfig.getTagsOnFailure());
+                record.getData().getEventMetadata().addTags(decompressProcessorConfig.getTagsOnFailure());
                 decompressionProcessingErrors.increment();
             }
         }

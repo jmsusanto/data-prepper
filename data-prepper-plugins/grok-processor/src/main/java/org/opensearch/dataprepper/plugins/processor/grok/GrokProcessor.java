@@ -133,11 +133,11 @@ public class GrokProcessor extends AbstractProcessor<Record<Event>, Record<Event
                 }
 
             } catch (final TimeoutException e) {
-                event.getMetadata().addTags(tagsOnTimeout);
+                event.getEventMetadata().addTags(tagsOnTimeout);
                 LOG.error(EVENT, "Matching on record [{}] took longer than [{}] and timed out", record.getData(), grokProcessorConfig.getTimeoutMillis());
                 grokProcessingTimeoutsCounter.increment();
             } catch (final ExecutionException | InterruptedException | RuntimeException e) {
-                event.getMetadata().addTags(tagsOnMatchFailure);
+                event.getEventMetadata().addTags(tagsOnMatchFailure);
                 LOG.error(EVENT, "An exception occurred when matching record [{}]", record.getData(), e);
                 grokProcessingErrorsCounter.increment();
             }
@@ -256,7 +256,7 @@ public class GrokProcessor extends AbstractProcessor<Record<Event>, Record<Event
 
         if (grokkedCaptures.isEmpty()) {
             if (tagsOnMatchFailure != null && tagsOnMatchFailure.size() > 0) {
-                event.getMetadata().addTags(tagsOnMatchFailure);
+                event.getEventMetadata().addTags(tagsOnMatchFailure);
             }
             grokProcessingMismatchCounter.increment();
         } else {

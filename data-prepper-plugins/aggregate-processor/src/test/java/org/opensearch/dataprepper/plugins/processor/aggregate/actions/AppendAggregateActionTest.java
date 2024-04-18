@@ -292,7 +292,7 @@ public class AppendAggregateActionTest {
         final AggregateActionOutput actionOutput = appendAggregateAction.concludeGroup(aggregateActionInput);
         final List<Event> result = actionOutput.getEvents();
         assertThat(result.size(), equalTo(1));
-        assertThat(result.get(0).getMetadata().getEventType(), equalTo(AppendAggregateAction.EVENT_TYPE));
+        assertThat(result.get(0).getEventMetadata().getEventType(), equalTo(AppendAggregateAction.EVENT_TYPE));
         assertThat(result.get(0).toMap(), equalTo(groupState));
     }
 }

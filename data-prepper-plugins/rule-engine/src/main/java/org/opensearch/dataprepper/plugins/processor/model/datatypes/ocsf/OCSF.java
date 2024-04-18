@@ -1,14 +1,23 @@
 package org.opensearch.dataprepper.plugins.processor.model.datatypes.ocsf;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Setter;
+import com.fasterxml.jackson.databind.JsonNode;
+import lombok.Data;
+import org.opensearch.dataprepper.expression.ExpressionEvaluator;
+import org.opensearch.dataprepper.model.event.DefaultEventHandle;
+import org.opensearch.dataprepper.model.event.DefaultEventMetadata;
+import org.opensearch.dataprepper.model.event.Event;
+import org.opensearch.dataprepper.model.event.EventHandle;
+import org.opensearch.dataprepper.model.event.EventMetadata;
+import org.opensearch.dataprepper.model.event.EventType;
 import org.opensearch.dataprepper.plugins.processor.model.datatypes.DataType;
 
 import java.util.List;
 import java.util.Map;
 
-@Setter
-public class OCSF extends DataType {
+@Data
+public class OCSF extends DataType implements Event {
     private Metadata metadata;
     private Long time;
     private Cloud cloud;
@@ -46,6 +55,13 @@ public class OCSF extends DataType {
     private List<Resource> resources;
     private Actor actor;
     private Map<String, String> unmapped;
+
+    @JsonIgnore
+    private EventMetadata eventMetadata = DefaultEventMetadata.builder().withEventType(EventType.LOG.toString()).build();
+    @JsonIgnore
+    private EventHandle eventHandle = new DefaultEventHandle(eventMetadata.getTimeReceived());
+    @JsonIgnore
+    private String timeFieldName = "time";
 
     public OCSF() {
         super();
@@ -117,5 +133,85 @@ public class OCSF extends DataType {
         }
 
         return unmapped.get(parts[1]);
+    }
+
+    @Override
+    public String getTimeFieldName() {
+        return timeFieldName;
+    }
+
+    @Override
+    public void put(String key, Object value) {
+
+    }
+
+    @Override
+    public <T> T get(String key, Class<T> clazz) {
+        return null;
+    }
+
+    @Override
+    public <T> List<T> getList(String key, Class<T> clazz) {
+        return null;
+    }
+
+    @Override
+    public void delete(String key) {
+
+    }
+
+    @Override
+    public String toJsonString() {
+        return null;
+    }
+
+    @Override
+    public JsonNode getJsonNode() {
+        return null;
+    }
+
+    @Override
+    public String getAsJsonString(String key) {
+        return null;
+    }
+
+    @Override
+    public EventMetadata getEventMetadata() {
+        return eventMetadata;
+    }
+
+    @Override
+    public boolean containsKey(String key) {
+        return false;
+    }
+
+    @Override
+    public boolean isValueAList(String key) {
+        return false;
+    }
+
+    @Override
+    public Map<String, Object> toMap() {
+        return null;
+    }
+
+    @Override
+    public String formatString(String format) {
+        return null;
+    }
+
+    @Override
+    public String formatString(String format, ExpressionEvaluator expressionEvaluator) {
+        return format;
+    }
+
+    @Override
+    public EventHandle getEventHandle() {
+        return eventHandle;
+    }
+
+    @Override
+    public JsonStringBuilder jsonBuilder() {
+        return null;
     }
 }

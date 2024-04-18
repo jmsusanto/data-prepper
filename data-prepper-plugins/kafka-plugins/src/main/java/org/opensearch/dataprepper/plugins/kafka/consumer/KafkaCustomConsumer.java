@@ -421,7 +421,7 @@ public class KafkaCustomConsumer implements Runnable, ConsumerRebalanceListener 
             data.put(key, value);
         }
         event = JacksonLog.builder().withData(data).build();
-        EventMetadata eventMetadata = event.getMetadata();
+        EventMetadata eventMetadata = event.getEventMetadata();
         if (kafkaKeyMode == KafkaKeyMode.INCLUDE_AS_METADATA) {
             eventMetadata.setAttribute("kafka_key", key);
         }

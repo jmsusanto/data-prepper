@@ -194,7 +194,7 @@ class S3SinkServiceIT {
             final Map actualDeserializedJson = objectMapperForDeserialization.readValue(actualLine, Map.class);
 
             final Map<String, Object> expectedMap = new HashMap<>(recordData.getData().toMap());
-            expectedMap.put("Tag", new ArrayList<>(recordData.getData().getMetadata().getTags()));
+            expectedMap.put("Tag", new ArrayList<>(recordData.getData().getEventMetadata().getTags()));
             assertThat(actualDeserializedJson, equalTo(expectedMap));
 
             final String expectedJsonString = recordData.getData().jsonBuilder().includeTags("Tag").toJsonString();
@@ -229,7 +229,7 @@ class S3SinkServiceIT {
             final Map actualDeserializedJson = objectMapperForDeserialization.readValue(actualLine, Map.class);
 
             final Map<String, Object> expectedMap = new HashMap<>(recordData.getData().toMap());
-            expectedMap.put("Tag", new ArrayList<>(recordData.getData().getMetadata().getTags()));
+            expectedMap.put("Tag", new ArrayList<>(recordData.getData().getEventMetadata().getTags()));
             assertThat(actualDeserializedJson, equalTo(expectedMap));
 
             final String expectedJsonString = recordData.getData().jsonBuilder().includeTags("Tag").toJsonString();

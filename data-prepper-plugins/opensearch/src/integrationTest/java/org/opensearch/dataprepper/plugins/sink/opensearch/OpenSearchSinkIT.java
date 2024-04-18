@@ -767,11 +767,11 @@ public class OpenSearchSinkIT {
         final PluginSetting pluginSetting = generatePluginSetting(null, testIndexAlias, testTemplateFile);
         pluginSetting.getSettings().put(IndexConfiguration.DOCUMENT_ID_FIELD, testIdField);
         Event event = (Event) testRecords.get(0).getData();
-        event.getMetadata().setAttribute("action", "create");
+        event.getEventMetadata().setAttribute("action", "create");
         final String actionFormatExpression = "${getMetadata(\"action\")}";
         when(expressionEvaluator.isValidFormatExpression(actionFormatExpression)).thenReturn(true);
         when(expressionEvaluator.isValidExpressionStatement("getMetadata(\"action\")")).thenReturn(true);
-        when(expressionEvaluator.evaluate("getMetadata(\"action\")", event)).thenReturn(event.getMetadata().getAttribute("action"));
+        when(expressionEvaluator.evaluate("getMetadata(\"action\")", event)).thenReturn(event.getEventMetadata().getAttribute("action"));
         pluginSetting.getSettings().put(IndexConfiguration.ACTION, actionFormatExpression);
         final OpenSearchSink sink = createObjectUnderTest(pluginSetting, true);
         sink.output(testRecords);
@@ -800,11 +800,11 @@ public class OpenSearchSinkIT {
         final PluginSetting pluginSetting = generatePluginSetting(null, testIndexAlias, testTemplateFile);
         pluginSetting.getSettings().put(IndexConfiguration.DOCUMENT_ID_FIELD, testIdField);
         Event event = (Event) testRecords.get(0).getData();
-        event.getMetadata().setAttribute("action", "unknown");
+        event.getEventMetadata().setAttribute("action", "unknown");
         final String actionFormatExpression = "${getMetadata(\"action\")}";
         when(expressionEvaluator.isValidFormatExpression(actionFormatExpression)).thenReturn(true);
         when(expressionEvaluator.isValidExpressionStatement("getMetadata(\"action\")")).thenReturn(true);
-        when(expressionEvaluator.evaluate("getMetadata(\"action\")", event)).thenReturn(event.getMetadata().getAttribute("action"));
+        when(expressionEvaluator.evaluate("getMetadata(\"action\")", event)).thenReturn(event.getEventMetadata().getAttribute("action"));
         pluginSetting.getSettings().put(IndexConfiguration.ACTION, actionFormatExpression);
         final OpenSearchSink sink = createObjectUnderTest(pluginSetting, true);
         sink.output(testRecords);
@@ -1076,7 +1076,7 @@ public class OpenSearchSinkIT {
                 .withEventType("event")
                 .build();
         List<String> tagsList = List.of("tag1", "tag2");
-        testEvent.getMetadata().addTags(tagsList);
+        testEvent.getEventMetadata().addTags(tagsList);
 
         final List<Record<Event>> testRecords = Collections.singletonList(new Record<>(testEvent));
 

@@ -86,7 +86,7 @@ public class DateProcessor extends AbstractProcessor<Record<Event>, Record<Event
                         Instant timeStamp = result.getRight();
                         if (dateProcessorConfig.getToOriginationMetadata()) {
                             Event event = (Event)record.getData();
-                            event.getMetadata().setExternalOriginationTime(timeStamp);
+                            event.getEventMetadata().setExternalOriginationTime(timeStamp);
                             event.getEventHandle().setExternalOriginationTime(timeStamp);
                         }
                     }
@@ -139,7 +139,7 @@ public class DateProcessor extends AbstractProcessor<Record<Event>, Record<Event
     }
 
     private String getDateTimeFromTimeReceived(final Record<Event> record) {
-        final Instant timeReceived = record.getData().getMetadata().getTimeReceived();
+        final Instant timeReceived = record.getData().getEventMetadata().getTimeReceived();
         return timeReceived.atZone(dateProcessorConfig.getDestinationZoneId()).format(getOutputFormatter());
     }
 

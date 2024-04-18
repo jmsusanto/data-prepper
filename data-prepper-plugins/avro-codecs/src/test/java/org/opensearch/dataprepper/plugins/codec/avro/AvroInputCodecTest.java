@@ -176,8 +176,8 @@ public class AvroInputCodecTest {
 
             assertThat(actualRecord, notNullValue());
             assertThat(actualRecord.getData(),notNullValue());
-            assertThat(actualRecord.getData().getMetadata(),notNullValue());
-            assertThat(actualRecord.getData().getMetadata().getEventType(), equalTo(EventType.LOG.toString()));
+            assertThat(actualRecord.getData().getEventMetadata(),notNullValue());
+            assertThat(actualRecord.getData().getEventMetadata().getEventType(), equalTo(EventType.LOG.toString()));
 
             Map<String,Object> expectedMap=new HashMap<>();
             GenericRecord record=generateRecords(parseSchema()).get(index);

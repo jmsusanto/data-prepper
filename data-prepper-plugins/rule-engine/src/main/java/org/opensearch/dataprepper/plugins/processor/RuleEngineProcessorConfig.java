@@ -39,6 +39,9 @@ public class RuleEngineProcessorConfig {
     @JsonProperty("drop_data")
     private boolean dropData = false;
 
+    @JsonProperty("sub_match_accessor")
+    private String subMatchAccessor;
+
     public Duration getRuleRefreshInterval() {
         return ruleRefreshInterval;
     }
@@ -65,5 +68,9 @@ public class RuleEngineProcessorConfig {
 
     public boolean isDropData() {
         return dropData;
+    }
+
+    public String getSubMatchAccessor() {
+        return subMatchAccessor;
     }
 }

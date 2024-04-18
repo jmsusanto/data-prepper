@@ -32,6 +32,10 @@ public class FieldAccessor {
         return getValue(event, convertFieldName(fieldName), Float.class);
     }
 
+    public Double getDoubleValue(final DataType event, final String fieldName) {
+        return getValue(event, convertFieldName(fieldName), Double.class);
+    }
+
     public Object getObjectValue(final DataType event, final String fieldName) {
         return getValue(event, convertFieldName(fieldName), Object.class);
     }
@@ -44,7 +48,7 @@ public class FieldAccessor {
         }
     }
 
-    private String convertFieldName(final String fieldName) {
+    public String convertFieldName(final String fieldName) {
         final String mappedFieldName = mapping.get(fieldName);
         return mappedFieldName == null ? fieldName : mappedFieldName;
     }

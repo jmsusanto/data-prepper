@@ -18,7 +18,7 @@ public class JacksonLog extends JacksonEvent implements Log {
     protected JacksonLog(final Builder builder) {
         super(builder);
 
-        checkArgument(this.getMetadata().getEventType().equals("LOG"), "eventType must be of type Log");
+        checkArgument(this.getEventMetadata().getEventType().equals("LOG"), "eventType must be of type Log");
     }
 
     /**

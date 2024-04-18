@@ -133,8 +133,8 @@ class UserAgentProcessorTest {
         final Event resultEvent = resultRecord.get(0).getData();
 
         assertThat(resultEvent.containsKey("user_agent"), is(false));
-        assertThat(resultEvent.getMetadata().getTags().contains(tagOnFailure1), is(true));
-        assertThat(resultEvent.getMetadata().getTags().contains(tagOnFailure2), is(true));
+        assertThat(resultEvent.getEventMetadata().getTags().contains(tagOnFailure1), is(true));
+        assertThat(resultEvent.getEventMetadata().getTags().contains(tagOnFailure2), is(true));
     }
 
     private UserAgentProcessor createObjectUnderTest() {

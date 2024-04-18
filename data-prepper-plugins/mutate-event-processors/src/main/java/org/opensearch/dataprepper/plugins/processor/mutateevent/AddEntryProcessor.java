@@ -75,9 +75,9 @@ public class AddEntryProcessor extends AbstractProcessor<Record<Event>, Record<E
                                 mergeValueToEvent(recordEvent, key, value);
                             }
                         } else {
-                            Map<String, Object> attributes = recordEvent.getMetadata().getAttributes();
+                            Map<String, Object> attributes = recordEvent.getEventMetadata().getAttributes();
                             if (!attributes.containsKey(metadataKey) || entry.getOverwriteIfKeyExists()) {
-                                recordEvent.getMetadata().setAttribute(metadataKey, value);
+                                recordEvent.getEventMetadata().setAttribute(metadataKey, value);
                             } else if (attributes.containsKey(metadataKey) && entry.getAppendIfKeyExists()) {
                                 mergeValueToEventMetadata(recordEvent, metadataKey, value);
                             }
@@ -113,7 +113,7 @@ public class AddEntryProcessor extends AbstractProcessor<Record<Event>, Record<E
     }
 
     private void mergeValueToEventMetadata(final Event recordEvent, final String key, final Object value) {
-        mergeValue(value, () -> recordEvent.getMetadata().getAttribute(key), newValue -> recordEvent.getMetadata().setAttribute(key, newValue));
+        mergeValue(value, () -> recordEvent.getEventMetadata().getAttribute(key), newValue -> recordEvent.getEventMetadata().setAttribute(key, newValue));
     }
 
     private void mergeValue(final Object value, Supplier<Object> getter, Consumer<Object> setter) {

@@ -11,7 +11,6 @@ import org.opensearch.dataprepper.pipeline.PipelineConnector;
 
 import org.opensearch.dataprepper.model.trace.Span;
 import org.opensearch.dataprepper.model.trace.JacksonSpan;
-import org.opensearch.dataprepper.model.record.Record;
 import org.opensearch.dataprepper.model.event.Event;
 import org.opensearch.dataprepper.model.event.JacksonEvent;
 import org.opensearch.dataprepper.model.event.EventFactory;
@@ -98,7 +97,7 @@ public class RouterCopyRecordStrategy implements RouterGetRecordStrategy {
                 Record newRecord;
                 DefaultEventHandle eventHandle = (DefaultEventHandle)recordEvent.getEventHandle();
                 if (eventHandle != null && eventHandle.getAcknowledgementSet() != null) {
-                    final EventMetadata eventMetadata = recordEvent.getMetadata();
+                    final EventMetadata eventMetadata = recordEvent.getEventMetadata();
                     final EventBuilder eventBuilder = (EventBuilder) eventFactory.eventBuilder(EventBuilder.class).withEventMetadata(eventMetadata).withData(recordEvent.toMap());
                     newRecordEvent = (JacksonEvent) eventBuilder.build();
 

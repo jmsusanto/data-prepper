@@ -322,7 +322,7 @@ class ListToMapProcessorTest {
 
         final Event resultEvent = resultRecord.get(0).getData();
         assertThat(resultEvent.get("mymap", Object.class), is(nullValue()));
-        assertThat(resultEvent.getMetadata().getTags(), is(new HashSet<>(testTags)));
+        assertThat(resultEvent.getEventMetadata().getTags(), is(new HashSet<>(testTags)));
     }
 
     @Test

@@ -488,8 +488,8 @@ public class GrokProcessorIT {
 
         assertThat(grokkedRecords.size(), equalTo(1));
         assertRecordsAreEqual(grokkedRecords.get(0), record);
-        assertTrue(((Event)record.getData()).getMetadata().getTags().contains(tagOnMatchFailure1));
-        assertTrue(((Event)record.getData()).getMetadata().getTags().contains(tagOnMatchFailure2));
+        assertTrue(((Event)record.getData()).getEventMetadata().getTags().contains(tagOnMatchFailure1));
+        assertTrue(((Event)record.getData()).getEventMetadata().getTags().contains(tagOnMatchFailure2));
     }
 
     @Test

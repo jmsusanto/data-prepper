@@ -841,7 +841,7 @@ public class KeyValueProcessorTests {
         final LinkedHashMap<String, Object> parsed_message = getLinkedHashMap(editedRecords);
 
         assertThat(parsed_message.size(), equalTo(0));
-        assertThat(record.getData().getMetadata().hasTags(List.of("tag1", "tag2")), is(true));
+        assertThat(record.getData().getEventMetadata().hasTags(List.of("tag1", "tag2")), is(true));
     }
 
     @Test
