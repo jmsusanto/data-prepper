@@ -1,0 +1,72 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+plugins {
+    id 'java'
+    id 'antlr'
+    id 'idea'
+}
+
+ext {
+    antlrGeneratedPackageDirectory = "org/opensearch/dataprepper/plugins/processor/rules/antlr/"
+}
+
+dependencies {
+    antlr('org.antlr:antlr4:4.10.1') {
+        exclude group: 'org.glassfish', module: 'javax.json'
+    }
+    implementation project(':data-prepper-api')
+    implementation project(':data-prepper-plugins:common')
+    implementation project(':data-prepper-plugins:aws-plugin-api')
+    implementation project(':data-prepper-plugins:opensearch')
+    implementation 'javax.inject:javax.inject:1'
+    implementation(libs.spring.core) {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+    implementation(libs.spring.context) {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+    implementation platform('org.apache.logging.log4j:log4j-bom:2.22.1')
+    implementation 'org.apache.logging.log4j:log4j-core'
+    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl'
+    implementation 'com.github.seancfoley:ipaddress:5.4.2'
+    implementation libs.opensearch.client
+    implementation libs.opensearch.rhlc
+    implementation libs.opensearch.java
+    implementation 'com.fasterxml.jackson.core:jackson-core'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation libs.commons.lang3
+    implementation 'org.projectlombok:lombok:1.18.26'
+    compileOnly 'org.projectlombok:lombok:1.18.26'
+    annotationProcessor 'org.projectlombok:lombok:1.18.26'
+}
+
+generateGrammarSource {
+    outputDirectory = new File("build/generated-src/antlr/main/${antlrGeneratedPackageDirectory}")
+    arguments += ['-package', 'org.opensearch.dataprepper.plugins.processor.rules.antlr']
+    arguments += ['-visitor']
+}
+
+jacocoTestCoverageVerification {
+    dependsOn jacocoTestReport
+    violationRules {
+        rule { //in addition to core projects rule - this one checks for 100% code coverage for this project
+            limit {
+                minimum = 1.0 // keep at 100%
+            }
+        }
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: ["${antlrGeneratedPackageDirectory}/**"])
+        }))
+    }
+}
+
+checkstyleMain {
+    source = fileTree('src/main/java')
+}
+

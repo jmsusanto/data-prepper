@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "product": {
+      "version": "1.08",
+      "name": "cloudtrail",
+      "vendor_name": "AWS",
+      "feature": {
+        "name": "Management"
+      }
+    },
+    "uid": "44c4dfed-03e1-4307-bf66-12ce2f917fca",
+    "profiles": ["cloud"],
+    "version": "1.0.0-rc.2"
+  },
+  "time": 1706588794000,
+  "cloud": {
+    "region": "us-east-1",
+    "provider": "AWS"
+  },
+  "dst_endpoint": null,
+  "http_request": {
+    "user_agent": "AWS Internal"
+  },
+  "src_endpoint": {
+    "uid": null,
+    "ip": null,
+    "domain": "AWS Internal"
+  },
+  "class_name": "api_activity",
+  "class_uid": 3005,
+  "category_name": "Identity & Access Management",
+  "category_uid": 3,
+  "severity_id": 1,
+  "severity": "Informational",
+  "user": null,
+  "activity_name": "Other",
+  "activity_id": 99,
+  "type_uid": 300599,
+  "type_name": "User Access Management: Other",
+  "status": "Success",
+  "status_id": 1,
+  "mfa": null,
+  "api": {
+    "response": {
+      "error": null,
+      "message": null
+    },
+    "operation": "CreateIPSet",
+    "version": null,
+    "service": {
+      "name": "guardduty.amazonaws.com"
+    },
+    "request": {
+      "uid": "d37919f9-5ade-491c-992a-806cb8bb4a4b"
+    }
+  },
+  "resources": [
+    {
+      "uid": "70c28d56-3c27-4d48-9f62-15fc507c1ff5",
+      "account_uid": "888888888888",
+      "type": "AWS::GuardDuty::IpSet"
+    }
+  ],
+  "actor": {
+    "user": {
+      "type": "IAMUser",
+      "name": null,
+      "uid": "3615781c-4c24-4660-951f-736f4ee445af",
+      "uuid": "01fac3b9-b1be-4884-beef-1b8abf53676d",
+      "account_uid": "888888888888",
+      "credential_uid": "0b4a8d4f-4103-4623-9883-cdab4d754b07"
+    },
+    "session": {
+      "created_time": 1706588794000,
+      "mfa": false,
+      "issuer": "9e25818e-3d90-42dd-9f4b-96b116f117a1"
+    },
+    "invoked_by": "AWS Internal",
+    "idp": {
+      "name": null
+    }
+  },
+  "unmapped": {
+    "userIdentity.sessionContext.sessionIssuer.type": "Role",
+    "eventType": "AwsApiCall",
+    "userIdentity.sessionContext.sessionIssuer.userName": "744632ad-2e3a-4380-8794-77a83d32dbf3",
+    "userIdentity.sessionContext.sessionIssuer.principalId": "2d69306c-8e3a-4b95-a615-598c948c420e",
+    "c55c046e-3941-406e-b15e-012cc50c027e": "b9276fbf-ba3f-4266-89c1-35070984bd67",
+    "4fd308de-048b-47ec-b1ba-e558f063568d": "144ac1aa-b273-4342-8a56-e47628b407a5",
+    "834c24ae-3e9a-4067-ba1b-a1a46033da69": "48127b36-6d65-44a2-a554-e9860717e048"
+  }
+}
