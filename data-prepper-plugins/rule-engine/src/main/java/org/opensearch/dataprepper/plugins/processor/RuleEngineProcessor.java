@@ -43,7 +43,6 @@ import java.util.stream.Collectors;
 @DataPrepperPlugin(name = "rule_engine", pluginType = Processor.class, pluginConfigurationType = RuleEngineProcessorConfig.class)
 public class RuleEngineProcessor extends AbstractProcessor<Record<Event>, Record<Event>> {
     private static final Logger LOG = LoggerFactory.getLogger(RuleEngineProcessor.class);
-
     private final RuleEvaluator ruleEvaluator;
     private final RuleEngineProcessorConfig config;
     private final FindingConverter findingConverter;
@@ -60,7 +59,6 @@ public class RuleEngineProcessor extends AbstractProcessor<Record<Event>, Record
                                final ExpressionEvaluator expressionEvaluator,
                                final AwsCredentialsSupplier awsCredentialsSupplier) throws IOException {
         super(pluginMetrics);
-
         this.config = config;
         this.expressionEvaluator = expressionEvaluator;
 
