@@ -66,6 +66,12 @@ jacocoTestCoverageVerification {
     }
 }
 
+tasks.named("sourcesJar", Jar) {
+    dependsOn generateGrammarSource
+    from "$buildDir/generated-src/antlr/main/${antlrGeneratedPackageDirectory}"
+}
+
+
 checkstyleMain {
     source = fileTree('src/main/java')
 }

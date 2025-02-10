@@ -9,6 +9,7 @@ import org.opensearch.dataprepper.model.event.DefaultEventHandle;
 import org.opensearch.dataprepper.model.event.DefaultEventMetadata;
 import org.opensearch.dataprepper.model.event.Event;
 import org.opensearch.dataprepper.model.event.EventHandle;
+import org.opensearch.dataprepper.model.event.EventKey;
 import org.opensearch.dataprepper.model.event.EventMetadata;
 import org.opensearch.dataprepper.model.event.EventType;
 import org.opensearch.dataprepper.plugins.processor.model.datatypes.DataType;
@@ -127,11 +128,9 @@ public class OCSF extends DataType implements Event {
         if (parts.length == 0 || !"unmapped".equals(parts[0])) {
             throw new IllegalArgumentException("Field " + fieldName + " does not exist in class " + getClass().getName());
         }
-
         if (parts.length == 1) {
             return unmapped;
         }
-
         return unmapped.get(parts[1]);
     }
 
@@ -142,7 +141,6 @@ public class OCSF extends DataType implements Event {
 
     @Override
     public void put(String key, Object value) {
-
     }
 
     @Override
@@ -157,7 +155,6 @@ public class OCSF extends DataType implements Event {
 
     @Override
     public void delete(String key) {
-
     }
 
     @Override
@@ -176,7 +173,7 @@ public class OCSF extends DataType implements Event {
     }
 
     @Override
-    public EventMetadata getEventMetadata() {
+    public EventMetadata getMetadata() {
         return eventMetadata;
     }
 
@@ -206,6 +203,12 @@ public class OCSF extends DataType implements Event {
     }
 
     @Override
+    public String formatString(String format, ExpressionEvaluator expressionEvaluator, String defaultValue) {
+        String result = formatString(format, expressionEvaluator);
+        return result != null ? result : defaultValue;
+    }
+
+    @Override
     public EventHandle getEventHandle() {
         return eventHandle;
     }
@@ -213,5 +216,50 @@ public class OCSF extends DataType implements Event {
     @Override
     public JsonStringBuilder jsonBuilder() {
         return null;
+    }
+
+    @Override
+    public void put(EventKey key, Object value) {
+        put(key.toString(), value);
+    }
+
+    @Override
+    public <T> T get(EventKey key, Class<T> clazz) {
+        return get(key.toString(), clazz);
+    }
+
+    @Override
+    public <T> List<T> getList(EventKey key, Class<T> clazz) {
+        return getList(key.toString(), clazz);
+    }
+
+    @Override
+    public void delete(EventKey key) {
+        delete(key.toString());
+    }
+
+    @Override
+    public String getAsJsonString(EventKey key) {
+        return getAsJsonString(key.toString());
+    }
+
+    @Override
+    public boolean containsKey(EventKey key) {
+        return containsKey(key.toString());
+    }
+
+    @Override
+    public boolean isValueAList(EventKey key) {
+        return isValueAList(key.toString());
+    }
+
+    @Override
+    public void clear() {
+        throw new UnsupportedOperationException("clear() is not supported on OCSF events");
+    }
+
+    @Override
+    public void merge(Event other) {
+        throw new UnsupportedOperationException("merge() is not supported on OCSF events");
     }
 }
