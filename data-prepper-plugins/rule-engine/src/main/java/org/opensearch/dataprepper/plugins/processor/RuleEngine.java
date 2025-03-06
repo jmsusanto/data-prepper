@@ -59,13 +59,13 @@ public class RuleEngine {
         if (ruleEvaluator == null) {
             ruleEvaluator = new DefaultRuleEvaluator(ruleStore);
         }
-        if (correlationEvaluator == null && config.getSubMatchAccessor() != null) {
-            correlationEvaluator = new DefaultCorrelationEvaluator(ruleStore, subMatchAccessorRegistrar.getSubMatchAccessor(config.getSubMatchAccessor()));
-            return CompositeRuleEvaluator.builder()
-                    .ruleEvaluator(ruleEvaluator)
-                    .correlationEvaluator(correlationEvaluator)
-                    .build();
-        }
+//        if (correlationEvaluator == null && config.getSubMatchAccessor() != null) {
+//            correlationEvaluator = new DefaultCorrelationEvaluator(ruleStore, subMatchAccessorRegistrar.getSubMatchAccessor(config.getSubMatchAccessor()));
+//            return CompositeRuleEvaluator.builder()
+//                    .ruleEvaluator(ruleEvaluator)
+//                    .correlationEvaluator(correlationEvaluator)
+//                    .build();
+//        }
 
         return ruleEvaluator;
     }

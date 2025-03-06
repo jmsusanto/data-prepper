@@ -32,6 +32,8 @@ dependencies {
     implementation libs.parquet.common
     implementation 'dev.failsafe:failsafe:3.3.2'
     implementation 'org.apache.httpcomponents:httpcore:4.4.16'
+    implementation 'com.fasterxml.jackson.module:jackson-module-afterburner'
+    implementation project(':data-prepper-plugins:rule-engine')
     testImplementation libs.commons.lang3
     testImplementation 'org.wiremock:wiremock:3.10.0'
     testImplementation 'org.eclipse.jetty:jetty-bom:11.0.20'

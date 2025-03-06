@@ -103,8 +103,8 @@ public class OpenSearchSigmaV1RuleParser implements RuleParser {
         final List<AggregationItem> aggregationItems = sigmaRule.getDetection().getParsedConditions().stream()
                 .map(SigmaCondition::parseAggregationItem)
                 .filter(Objects::nonNull)
+                .filter(item -> item.getAggFunction() != null)
                 .collect(Collectors.toList());
-
         if (aggregationItems.size() > 1) {
             throw new UnsupportedOperationException("Expected 0 or 1 aggregations. Found " + aggregationItems.size() + " for rule with id " + sigmaRule.getId());
         }

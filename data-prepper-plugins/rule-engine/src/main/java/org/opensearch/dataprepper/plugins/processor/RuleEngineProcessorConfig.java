@@ -37,7 +37,7 @@ public class RuleEngineProcessorConfig {
     private Map<String, Object> openSearchConfiguration;
 
     @JsonProperty("drop_data")
-    private boolean dropData = false;
+    private boolean dropData = true;
 
     @JsonProperty("sub_match_accessor")
     private String subMatchAccessor;

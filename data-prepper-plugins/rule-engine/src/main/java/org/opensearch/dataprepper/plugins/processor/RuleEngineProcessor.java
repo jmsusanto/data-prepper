@@ -19,11 +19,13 @@ import org.opensearch.dataprepper.model.record.Record;
 import org.opensearch.dataprepper.plugins.processor.converters.FindingConverter;
 import org.opensearch.dataprepper.plugins.processor.evaluator.RuleEvaluator;
 import org.opensearch.dataprepper.plugins.processor.model.datatypes.DataType;
+import org.opensearch.dataprepper.plugins.processor.model.datatypes.ocsf.OCSF;
 import org.opensearch.dataprepper.plugins.processor.model.matches.Match;
 import org.opensearch.dataprepper.plugins.processor.provider.rules.opensearch.OpenSearchRuleProvider;
 import org.opensearch.dataprepper.plugins.processor.retrievers.OpenSearchSubMatchAccessor;
 import org.opensearch.dataprepper.plugins.processor.util.OpenSearchDocMetadata;
 import org.opensearch.dataprepper.plugins.sink.opensearch.OpenSearchSinkConfiguration;
+import org.opensearch.dataprepper.plugins.sink.opensearch.configuration.OpenSearchSinkConfig;
 import org.opensearch.dataprepper.plugins.sink.opensearch.index.ClusterSettingsParser;
 import org.opensearch.dataprepper.plugins.sink.opensearch.index.IndexManager;
 import org.opensearch.dataprepper.plugins.sink.opensearch.index.IndexManagerFactory;
@@ -32,6 +34,7 @@ import org.opensearch.dataprepper.plugins.sink.opensearch.index.IndexTemplateAPI
 import org.opensearch.dataprepper.plugins.sink.opensearch.index.TemplateStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -62,8 +65,17 @@ public class RuleEngineProcessor extends AbstractProcessor<Record<Event>, Record
         this.config = config;
         this.expressionEvaluator = expressionEvaluator;
 
-        openSearchSinkConfiguration = OpenSearchSinkConfiguration.readESConfig(
-                new PluginSetting("opensearch_config", config.getOpenSearchConfiguration()), expressionEvaluator);
+        // START: This is temporary and will be changed soon. In the future, all rules are pulled from USO rather than individual stores such as an OpenSearch index
+        ObjectMapper mapper = new ObjectMapper();
+        OpenSearchSinkConfig openSearchSinkConfig = mapper.convertValue(
+                config.getOpenSearchConfiguration(),
+                OpenSearchSinkConfig.class
+        );
+
+        openSearchSinkConfiguration = OpenSearchSinkConfiguration.readOSConfig(
+                openSearchSinkConfig,
+                expressionEvaluator);
+
         final RestHighLevelClient restHighLevelClient = openSearchSinkConfiguration.getConnectionConfiguration().createClient(awsCredentialsSupplier);
         openSearchClient = openSearchSinkConfiguration.getConnectionConfiguration()
                 .createOpenSearchClient(restHighLevelClient, awsCredentialsSupplier);
@@ -74,6 +86,7 @@ public class RuleEngineProcessor extends AbstractProcessor<Record<Event>, Record
         final IndexManagerFactory indexManagerFactory = new IndexManagerFactory(new ClusterSettingsParser());
         indexManager = indexManagerFactory.getIndexManager(openSearchSinkConfiguration.getIndexConfiguration().getIndexType(), openSearchClient, restHighLevelClient,
                 openSearchSinkConfiguration, templateStrategy, openSearchSinkConfiguration.getIndexConfiguration().getIndexAlias());
+        // END: 'registerRuleProvider' and 'registerSubMatchAccessor' will also be modified soon
 
         final RuleEngine ruleEngine = new RuleEngine();
         ruleEngine.registerRuleProvider("opensearch", () -> new OpenSearchRuleProvider(openSearchClient));
@@ -109,10 +122,11 @@ public class RuleEngineProcessor extends AbstractProcessor<Record<Event>, Record
         LOG.info("Matches as events: {}", matches.size());
 
         if (config.isDropData()) {
-            return matches;
+            records.clear();
         }
 
         records.addAll(matches);
+
         return records;
     }
 

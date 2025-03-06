@@ -2,16 +2,13 @@ package org.opensearch.dataprepper.plugins.processor.model.datatypes.ocsf;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.Data;
 import org.opensearch.dataprepper.expression.ExpressionEvaluator;
-import org.opensearch.dataprepper.model.event.DefaultEventHandle;
-import org.opensearch.dataprepper.model.event.DefaultEventMetadata;
-import org.opensearch.dataprepper.model.event.Event;
-import org.opensearch.dataprepper.model.event.EventHandle;
-import org.opensearch.dataprepper.model.event.EventKey;
-import org.opensearch.dataprepper.model.event.EventMetadata;
-import org.opensearch.dataprepper.model.event.EventType;
+import org.opensearch.dataprepper.model.event.*;
 import org.opensearch.dataprepper.plugins.processor.model.datatypes.DataType;
 
 import java.util.List;
@@ -102,6 +99,7 @@ public class OCSF extends DataType implements Event {
             case "mfa": return mfa;
             case "api.response.error": return api.getResponse().getError();
             case "api.response.message": return api.getResponse().getMessage();
+            case "displaymessage": return api.getResponse().getMessage();
             case "api.operation": return api.getOperation();
             case "api.version": return api.getVersion();
             case "api.service.name": return api.getService().getName();
@@ -138,7 +136,29 @@ public class OCSF extends DataType implements Event {
     public String getTimeFieldName() {
         return timeFieldName;
     }
+    @Override
+    public String toJsonString() {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            return mapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error converting OCSF event to JSON", e);
+        }
+    }
 
+    // ===============================================================
+    // CHANGED: Implement jsonBuilder to return a valid JsonStringBuilder
+    // ===============================================================
+    @Override
+    public Event.JsonStringBuilder jsonBuilder() {
+        return new Event.JsonStringBuilder() {
+            @Override
+            public String toJsonString() {
+                return OCSF.this.toJsonString();
+            }
+        };
+    }
     @Override
     public void put(String key, Object value) {
     }
@@ -157,14 +177,16 @@ public class OCSF extends DataType implements Event {
     public void delete(String key) {
     }
 
-    @Override
-    public String toJsonString() {
-        return null;
-    }
-
+    @JsonIgnore
     @Override
     public JsonNode getJsonNode() {
-        return null;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            return mapper.valueToTree(this);
+        } catch (Exception e) {
+            throw new RuntimeException("Error converting OCSF event to JsonNode", e);
+        }
     }
 
     @Override
@@ -213,10 +235,6 @@ public class OCSF extends DataType implements Event {
         return eventHandle;
     }
 
-    @Override
-    public JsonStringBuilder jsonBuilder() {
-        return null;
-    }
 
     @Override
     public void put(EventKey key, Object value) {

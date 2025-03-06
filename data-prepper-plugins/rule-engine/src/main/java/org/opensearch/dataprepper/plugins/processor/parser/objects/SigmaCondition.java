@@ -4,6 +4,7 @@
  */
 package org.opensearch.dataprepper.plugins.processor.parser.objects;
 
+import lombok.extern.log4j.Log4j2;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.opensearch.dataprepper.plugins.processor.parser.aggregation.AggregationItem;
@@ -26,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@Log4j2
 public class SigmaCondition {
 
     private final String identifier = "[a-zA-Z0-9-_]+";
@@ -87,7 +89,8 @@ public class SigmaCondition {
             return null;
         }
 
-        aggregationVisitor.visit(aggParser.comparison_expr());
+    //    aggregationVisitor.visit(aggParser.comparison_expr());
+
         return aggregationVisitor.getAggregationItem();
     }
 
