@@ -8,7 +8,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.Data;
 import org.opensearch.dataprepper.expression.ExpressionEvaluator;
-import org.opensearch.dataprepper.model.event.*;
+import org.opensearch.dataprepper.model.event.DefaultEventHandle;
+import org.opensearch.dataprepper.model.event.DefaultEventMetadata;
+import org.opensearch.dataprepper.model.event.Event;
+import org.opensearch.dataprepper.model.event.EventHandle;
+import org.opensearch.dataprepper.model.event.EventKey;
+import org.opensearch.dataprepper.model.event.EventMetadata;
+import org.opensearch.dataprepper.model.event.EventType;
 import org.opensearch.dataprepper.plugins.processor.model.datatypes.DataType;
 
 import java.util.List;
@@ -147,9 +153,7 @@ public class OCSF extends DataType implements Event {
         }
     }
 
-    // ===============================================================
-    // CHANGED: Implement jsonBuilder to return a valid JsonStringBuilder
-    // ===============================================================
+    // this is required if we disable drop_data
     @Override
     public Event.JsonStringBuilder jsonBuilder() {
         return new Event.JsonStringBuilder() {

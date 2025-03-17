@@ -8,7 +8,6 @@ import org.opensearch.dataprepper.metrics.PluginMetrics;
 import org.opensearch.dataprepper.model.acknowledgements.AcknowledgementSet;
 import org.opensearch.dataprepper.model.annotations.DataPrepperPlugin;
 import org.opensearch.dataprepper.model.annotations.DataPrepperPluginConstructor;
-import org.opensearch.dataprepper.model.configuration.PluginSetting;
 import org.opensearch.dataprepper.model.event.DefaultEventHandle;
 import org.opensearch.dataprepper.model.event.Event;
 import org.opensearch.dataprepper.model.log.JacksonLog;
@@ -19,10 +18,8 @@ import org.opensearch.dataprepper.model.record.Record;
 import org.opensearch.dataprepper.plugins.processor.converters.FindingConverter;
 import org.opensearch.dataprepper.plugins.processor.evaluator.RuleEvaluator;
 import org.opensearch.dataprepper.plugins.processor.model.datatypes.DataType;
-import org.opensearch.dataprepper.plugins.processor.model.datatypes.ocsf.OCSF;
 import org.opensearch.dataprepper.plugins.processor.model.matches.Match;
 import org.opensearch.dataprepper.plugins.processor.provider.rules.opensearch.OpenSearchRuleProvider;
-import org.opensearch.dataprepper.plugins.processor.retrievers.OpenSearchSubMatchAccessor;
 import org.opensearch.dataprepper.plugins.processor.util.OpenSearchDocMetadata;
 import org.opensearch.dataprepper.plugins.sink.opensearch.OpenSearchSinkConfiguration;
 import org.opensearch.dataprepper.plugins.sink.opensearch.configuration.OpenSearchSinkConfig;
@@ -65,7 +62,6 @@ public class RuleEngineProcessor extends AbstractProcessor<Record<Event>, Record
         this.config = config;
         this.expressionEvaluator = expressionEvaluator;
 
-        // START: This is temporary and will be changed soon. In the future, all rules are pulled from USO rather than individual stores such as an OpenSearch index
         ObjectMapper mapper = new ObjectMapper();
         OpenSearchSinkConfig openSearchSinkConfig = mapper.convertValue(
                 config.getOpenSearchConfiguration(),
@@ -86,11 +82,9 @@ public class RuleEngineProcessor extends AbstractProcessor<Record<Event>, Record
         final IndexManagerFactory indexManagerFactory = new IndexManagerFactory(new ClusterSettingsParser());
         indexManager = indexManagerFactory.getIndexManager(openSearchSinkConfiguration.getIndexConfiguration().getIndexType(), openSearchClient, restHighLevelClient,
                 openSearchSinkConfiguration, templateStrategy, openSearchSinkConfiguration.getIndexConfiguration().getIndexAlias());
-        // END: 'registerRuleProvider' and 'registerSubMatchAccessor' will also be modified soon
 
         final RuleEngine ruleEngine = new RuleEngine();
         ruleEngine.registerRuleProvider("opensearch", () -> new OpenSearchRuleProvider(openSearchClient));
-        ruleEngine.registerSubMatchAccessor("opensearch", () -> new OpenSearchSubMatchAccessor(openSearchClient));
 
         final RuleEngineConfig ruleEngineConfig = RuleEngineConfig.builder()
                 .ruleRefreshInterval(config.getRuleRefreshInterval())
@@ -98,8 +92,7 @@ public class RuleEngineProcessor extends AbstractProcessor<Record<Event>, Record
                 .logType(config.getLogType())
                 .ruleLocation(config.getRuleLocation())
                 .ruleSchema(config.getRuleSchema())
-                .subMatchAccessor(config.getSubMatchAccessor())
-                .build();
+                    .build();
         ruleEvaluator = ruleEngine.start(ruleEngineConfig);
         findingConverter = new FindingConverter();
         acknowledgementSet = null;

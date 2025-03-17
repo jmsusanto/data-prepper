@@ -2,7 +2,6 @@ package org.opensearch.dataprepper.plugins.processor.converters;
 
 import org.opensearch.dataprepper.plugins.processor.model.matches.Match;
 import org.opensearch.dataprepper.plugins.processor.rules.OpenSearchRuleMetadata;
-import org.opensearch.dataprepper.plugins.processor.rules.OpenSearchSigmaV1StatefulRule;
 import org.opensearch.dataprepper.plugins.processor.rules.OpenSearchSigmaV1StatelessRule;
 import org.opensearch.dataprepper.plugins.processor.rules.Rule;
 import org.opensearch.dataprepper.plugins.processor.util.OpenSearchDocMetadata;
@@ -28,9 +27,7 @@ public class FindingConverter {
         final Map<String, List<Rule>> monitorToRules = new HashMap<>();
 
         match.getRules().forEach(rule -> {
-            final String monitorId = rule instanceof OpenSearchSigmaV1StatelessRule ?
-                    ((OpenSearchSigmaV1StatelessRule) rule).getOpenSearchRuleMetadata().getMonitorId() :
-                    ((OpenSearchSigmaV1StatefulRule) rule).getOpenSearchRuleMetadata().getMonitorId();
+                final String monitorId = ((OpenSearchSigmaV1StatelessRule) rule).getOpenSearchRuleMetadata().getMonitorId();
 
             monitorToRules.putIfAbsent(monitorId, new ArrayList<>());
             monitorToRules.get(monitorId).add(rule);
@@ -40,10 +37,7 @@ public class FindingConverter {
     }
 
     private Map<String, Object> generateEventForMonitor(final Match match, final List<Rule> rules) {
-        final OpenSearchRuleMetadata openSearchRuleMetadata = rules.get(0) instanceof OpenSearchSigmaV1StatelessRule ?
-                ((OpenSearchSigmaV1StatelessRule) rules.get(0)).getOpenSearchRuleMetadata() :
-                ((OpenSearchSigmaV1StatefulRule) rules.get(0)).getOpenSearchRuleMetadata();
-
+        final OpenSearchRuleMetadata openSearchRuleMetadata = ((OpenSearchSigmaV1StatelessRule) rules.get(0)).getOpenSearchRuleMetadata();
         final Map<String, Object> eventMap = new HashMap<>();
         eventMap.put("id", UUID.randomUUID().toString());
         eventMap.put("monitor_id", openSearchRuleMetadata.getMonitorId());
@@ -59,19 +53,12 @@ public class FindingConverter {
     }
 
     private Map<String, Object> getQuery(final Rule rule) {
-        List<String> tags = null;
-        if (rule instanceof OpenSearchSigmaV1StatelessRule) {
-            tags = ((OpenSearchSigmaV1StatelessRule) rule).getSigmaV1RuleMetadata().getTags();
-        } else if (rule instanceof OpenSearchSigmaV1StatefulRule) {
-            tags = ((OpenSearchSigmaV1StatefulRule) rule).getSigmaV1RuleMetadata().getTags();
-        }
-
+        List<String> tags =((OpenSearchSigmaV1StatelessRule) rule).getSigmaV1RuleMetadata().getTags();;
         final Map<String, Object> queryMap = new HashMap<>();
         queryMap.put("id", rule.getId());
         queryMap.put("name", rule.getId());
         queryMap.put("query", "PLACEHOLDER");
         queryMap.put("tags", tags);
-
         return queryMap;
     }
 }

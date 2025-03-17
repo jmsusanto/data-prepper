@@ -16,8 +16,10 @@ import java.util.stream.Collectors;
 @Log4j2
 public class DefaultRuleEvaluator implements RuleEvaluator {
     private final RuleStore ruleStore;
+    private final RulePrefilter rulePrefilter;
 
-    public DefaultRuleEvaluator(final RuleStore ruleStore) {
+    public DefaultRuleEvaluator(final RuleStore ruleStore, final RulePrefilter rulePrefilter) {
+        this.rulePrefilter = rulePrefilter;
         this.ruleStore = ruleStore;
     }
 
@@ -30,21 +32,34 @@ public class DefaultRuleEvaluator implements RuleEvaluator {
         final List<StatelessRule> statelessRules = ruleStore.getRules();
         final List<Match> matches = new ArrayList<>();
 
-        data.forEach(item -> {
-            final List<Rule> statelessRuleMatches = statelessRules.stream()
-                    // Skip rules that don't apply
-                    .filter(rule -> rule.testEvaluationCondition(item))
-                    .filter(rule -> rule.testRuleCondition(item))
-                    .collect(Collectors.toList());
+        log.info("Compiling prefilter for {} rules", statelessRules.size());
+        rulePrefilter.compilePrefilter(statelessRules);
 
-            if (statelessRuleMatches.size() > 0) {
-                matches.add(Match.builder()
-                        .dataType(item)
-                        .rules(statelessRuleMatches)
-                        .build());
+        data.forEach(item -> {
+            final List<StatelessRule> prefilteredRules = rulePrefilter.filterRules(item);
+
+            log.info("Prefilter reduced rules from {} to {} for item",
+                    statelessRules.size(), prefilteredRules.size());
+
+            if (!prefilteredRules.isEmpty()) {  // Add check to skip processing if no rules passed prefilter
+                final List<Rule> statelessRuleMatches = prefilteredRules.stream()
+                        .filter(rule -> rule.testEvaluationCondition(item))
+                        .filter(rule -> rule.testRuleCondition(item))
+                        .collect(Collectors.toList());
+
+                if (!statelessRuleMatches.isEmpty()) {  // Use isEmpty() for better readability
+                    matches.add(Match.builder()
+                            .dataType(item)
+                            .rules(statelessRuleMatches)
+                            .build());
+                }
             }
         });
-        log.info("Found {} matches from {} docs", matches.size(), data.size());
+
+        log.info("Found {} matches from {} docs ({}% match rate)",
+                matches.size(),
+                data.size(),
+                String.format("%.2f", (matches.size() * 100.0) / data.size()));
 
         return matches;
     }

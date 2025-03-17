@@ -2,6 +2,7 @@ package org.opensearch.dataprepper.plugins.processor.rules;
 
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 @SuperBuilder
@@ -9,6 +10,7 @@ public abstract class Rule<T, U> {
     private final String id;
     private final Predicate<T> evaluationCondition;
     private final Predicate<U> ruleCondition;
+    private final List<String> keywords;
 
     public boolean testEvaluationCondition(final T input) {
         return evaluationCondition.test(input);
@@ -21,4 +23,6 @@ public abstract class Rule<T, U> {
     public String getId() {
         return id;
     }
+
+    public List<String> getKeywords() { return keywords; };
 }

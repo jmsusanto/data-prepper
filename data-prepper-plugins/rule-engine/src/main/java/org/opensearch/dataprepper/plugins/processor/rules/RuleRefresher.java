@@ -29,10 +29,9 @@ public class RuleRefresher implements Runnable {
         try {
             final List<RuleData> ruleData = ruleProvider.getRules();
             final List<StatelessRule> statelessRules = new ArrayList<>();
-            final List<StatefulRule> statefulRules = new ArrayList<>();
+            ruleData.forEach(ruleDatum -> ruleParser.parseRule(ruleDatum, statelessRules::add));
+            sigmaRuleStore.updateRuleStore(statelessRules);
 
-            ruleData.forEach(ruleDatum -> ruleParser.parseRule(ruleDatum, statelessRules::add, statefulRules::add));
-            sigmaRuleStore.updateRuleStore(statelessRules, statefulRules);
         } catch (final Exception e) {
             LOG.error("Caught exception refreshing rules", e);
         }

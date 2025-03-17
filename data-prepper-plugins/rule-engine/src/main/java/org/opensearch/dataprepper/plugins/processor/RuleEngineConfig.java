@@ -14,5 +14,4 @@ public class RuleEngineConfig {
     private final String logType;
     private final RuleSchema ruleSchema;
     private final String ruleLocation;
-    private final String subMatchAccessor;
 }

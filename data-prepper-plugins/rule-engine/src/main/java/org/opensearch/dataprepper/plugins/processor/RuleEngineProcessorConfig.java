@@ -14,7 +14,7 @@ public class RuleEngineProcessorConfig {
     static final LogFormat DEFAULT_LOG_FORMAT = LogFormat.NONE;
 
     @JsonProperty("rule_refresh_interval")
-    private Duration ruleRefreshInterval = DEFAULT_RULE_REFRESH_INTERVAL;
+    private final Duration ruleRefreshInterval = DEFAULT_RULE_REFRESH_INTERVAL;
 
     @JsonProperty("log_type")
     @NotEmpty
@@ -38,9 +38,6 @@ public class RuleEngineProcessorConfig {
 
     @JsonProperty("drop_data")
     private boolean dropData = true;
-
-    @JsonProperty("sub_match_accessor")
-    private String subMatchAccessor;
 
     public Duration getRuleRefreshInterval() {
         return ruleRefreshInterval;
@@ -68,9 +65,5 @@ public class RuleEngineProcessorConfig {
 
     public boolean isDropData() {
         return dropData;
-    }
-
-    public String getSubMatchAccessor() {
-        return subMatchAccessor;
     }
 }
